@@ -1,0 +1,24 @@
+[package]
+name = "secret-hitler-companion"
+version = "0.1.0"
+description = "Offline companion for the physical Secret Hitler board game"
+authors = ["Secret Hitler Companion contributors"]
+edition = "2021"
+rust-version = "1.77.2"
+
+[lib]
+name = "secret_hitler_companion_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+tauri = { version = "2", features = [] }
+tauri-plugin-store = "2"
+
+[features]
+# Enabled by `tauri build` so the app serves the bundled frontend instead of the dev server.
+custom-protocol = ["tauri/custom-protocol"]
