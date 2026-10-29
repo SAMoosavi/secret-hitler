@@ -124,6 +124,7 @@ const fa: typeof en = {
     passTo: 'گوشی را به {name} بدهید',
     handoff: 'مطمئن شوید فقط {name} صفحه را می‌بیند.',
     ready: 'من {name} هستم؛ نقشم را نشان بده',
+    tapToReveal: 'برای دیدن نقش، لمس کنید',
     roleTitle: 'نقش مخفی شما',
     youAre: 'شما هستید',
     liberal: 'لیبرال',

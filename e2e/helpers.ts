@@ -33,6 +33,20 @@ export async function revealAllRoles(page: Page, names = NAMES): Promise<void> {
     await expect(page.getByRole('heading', { name: `Pass the phone to ${name}` })).toBeVisible()
     await page.getByRole('button', { name: new RegExp(`^I am ${name}`) }).click()
     await expect(page.getByText('Your secret role')).toBeVisible()
+    // Face down: no role word anywhere in the rendered screen, not even the
+    // progress header, and neither the knowledge panel nor the hide action exists.
+    expect(await page.locator('main').innerText()).not.toMatch(/\b(Liberal|Fascist|Hitler)\b/)
+    expect(await page.locator('.page > header').innerText()).not.toMatch(/\b(Liberal|Fascist|Hitler)\b/)
+    await expect(page.getByText('What you know')).toHaveCount(0)
+    await expect(page.getByText('Team Liberal', { exact: true })).toHaveCount(0)
+    await expect(page.getByText('Team Fascist', { exact: true })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /^Hide role/ })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Tap to reveal' })).toBeVisible()
+    await page.getByRole('button', { name: 'Tap to reveal' }).click()
+    await expect(page.getByText(/^Team (Liberal|Fascist)$/)).toBeVisible()
+    await expect(page.getByText('What you know')).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Tap to reveal' })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: /^Hide role/ })).toBeVisible()
     const last = index === names.length - 1
     await hideRole(page, last)
   }

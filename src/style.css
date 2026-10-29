@@ -428,6 +428,27 @@ textarea {
   opacity: 0.35;
   pointer-events: none;
 }
+.role-card {
+  perspective: 60rem;
+}
+.role-card-inner {
+  display: grid;
+  transform-style: preserve-3d;
+  transition: transform 360ms ease;
+}
+.role-card.flipped .role-card-inner {
+  transform: rotateY(180deg);
+}
+.role-card-face {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+}
+.role-card-front {
+  transform: rotateY(180deg);
+}
+.reveal-card-col {
+  width: 100%;
+}
 .track-space {
   position: relative;
   display: flex;
@@ -565,6 +586,30 @@ dialog.app-dialog[open] .dialog-card {
   *::after {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
+  }
+}
+
+/* Reveal on a phone held sideways: the card sits beside its knowledge and
+   actions, sized by height so the hide action stays on one screen (5/7 kept). */
+@media (orientation: landscape) and (max-height: 480px) {
+  .reveal-stage.is-flipped {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 0.5rem 1rem;
+    width: 100%;
+  }
+  .reveal-card-col {
+    width: auto;
+  }
+  .reveal-card-col .role-card {
+    aspect-ratio: 5 / 7;
+    width: auto;
+    height: 62vh;
+    max-width: none;
+  }
+  .reveal-info > :first-child {
+    margin-top: 0;
   }
 }
 

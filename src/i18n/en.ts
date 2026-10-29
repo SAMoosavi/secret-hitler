@@ -122,6 +122,7 @@ export default {
     passTo: 'Pass the phone to {name}',
     handoff: 'Make sure only {name} can see the screen.',
     ready: 'I am {name} — show my role',
+    tapToReveal: 'Tap to reveal',
     roleTitle: 'Your secret role',
     youAre: 'You are',
     liberal: 'Liberal',

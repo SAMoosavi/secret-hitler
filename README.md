@@ -40,7 +40,7 @@ with the command below):
 
 ```
 apk/secret-hitler-companion-0.1.0-arm64-debug.apk   20 MB
-sha256 497e8f274a1ab361fc16c39c834dbe99f59c1041982f91ed6684e5cf032dee6b
+sha256 df5ef46cab9b3c875dfb0522e2b85dbf4703b8eb894ee3a164408c8f8ffccd89
 ```
 
 Install over USB or by opening the file on the device (allow unknown sources):
