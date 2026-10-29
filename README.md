@@ -84,7 +84,7 @@ here. Runtime behavior on Android is unconfirmed.
 ### GitHub releases (CI)
 
 `.github/workflows/release.yml` builds the same arm64 debug APK and attaches it
-to a GitHub Release whenever a pull request is **merged into `develop`** (or when
+to a GitHub Release whenever a pull request is **merged into `main`** (or when
 run manually from the Actions tab). The release tag is
 `v<package version>-build.<run number>` and the assets are
 `secret-hitler-companion-<version>-arm64-debug.apk` plus its `.sha256`.
@@ -111,9 +111,8 @@ base64 -w0 ~/.android/debug.keystore | gh secret set ANDROID_DEBUG_KEYSTORE_BASE
 ```
 
 PRs opened from a fork get a read-only token and cannot publish a release; merge
-from a branch in this repository. The workflow has not been executed here (this
-checkout has no `develop` branch and nothing is pushed), so treat the first run
-as a test.
+from a branch in this repository. The first run after this workflow landed is
+the test: it was written but never executed locally.
 
 ### Android hardening (applied in the generated project)
 
