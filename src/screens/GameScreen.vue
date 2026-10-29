@@ -108,7 +108,6 @@ async function nominate(): Promise<void> {
     title: t('nomination.confirmTitle', { name }),
     message: t('nomination.confirmBody'),
     confirmLabel: t('nomination.submit'),
-    required: true,
   })
   if (!ok) return
   await act({ type: 'nominate', playerId: selected.value.id })

@@ -67,19 +67,9 @@ test('setup, private reveals, an approved government and a resume mid-session', 
   await createGame(page, NAMES)
   await revealAllRoles(page, NAMES)
 
-  // Cancelling a nomination confirmation must leave the table untouched.
-  await page.getByRole('button').filter({ hasText: 'Eligible' }).first().click()
-  await expect(page.getByText(/^Choose /)).toBeVisible()
-  await page.getByRole('button', { name: 'Nominate', exact: true }).click()
-  await expect(page.getByRole('dialog').last()).toBeVisible()
-  await page.getByRole('dialog').last().getByRole('button', { name: 'Cancel' }).click()
-  await expect(page.getByRole('dialog')).toHaveCount(0)
-  await expect(page.getByRole('heading', { name: 'Record the vote' })).toHaveCount(0)
-
   await electGovernment(page)
 
   await revealFirstCard(page)
-  await confirmWith(page, 'Discard this policy')
 
   const chancellorDialog = page.getByRole('dialog', { name: 'Chancellor: enact one policy' })
   await expect(chancellorDialog).toBeVisible()
@@ -97,7 +87,6 @@ test('setup, private reveals, an approved government and a resume mid-session', 
   await expect(page.getByText('Fascist policy')).toHaveCount(0)
 
   await revealFirstCard(page)
-  await confirmWith(page, 'Enact this policy')
 
   await expect(page.locator('h1')).toContainText(/Round/)
   await expect(page.getByRole('heading', { name: 'Nominate a chancellor' })).toBeVisible()
@@ -266,23 +255,15 @@ test('the card flips in Persian RTL and its role text is not clipped', async ({ 
   expect(clipped, `clipped text: ${clipped.join(', ')}`).toEqual([])
 })
 
-test('cancelling the role-hide confirmation keeps the revealed role on screen', async ({ page }) => {
+test('hiding a revealed role needs no dialog and advances to the next player', async ({ page }) => {
   await createGame(page)
   await page.getByRole('button', { name: /^I am Alice/ }).click()
   await expect(page.getByText('Your secret role')).toBeVisible()
   await page.getByRole('button', { name: 'Tap to reveal' }).click()
   await expect(page.locator('.role-card-front')).toBeVisible()
-  const revealedRole = await page.locator('.role-card-front h1').innerText()
 
   await page.getByRole('button', { name: 'Hide role and pass on' }).click()
-  await expect(page.getByRole('dialog').last()).toBeVisible()
-  await page.getByRole('dialog').last().getByRole('button', { name: 'Cancel' }).click()
-
-  await expect(page.getByText('Your secret role')).toBeVisible()
-  await expect(page.locator('.role-card-front h1')).toHaveText(revealedRole)
-  await expect(page.getByRole('button', { name: 'Tap to reveal' })).toHaveCount(0)
-  await expect(page.getByText('1 of 7')).toBeVisible()
-  await hideRole(page)
+  await expect(page.getByRole('dialog')).toHaveCount(0)
   await expect(page.getByRole('heading', { name: 'Pass the phone to Bob' })).toBeVisible()
 })
 
@@ -316,6 +297,58 @@ function fivePlayerNomination(): GameState {
   }
 }
 
+test('cancelling the vote confirmation leaves the game state byte-identical', async ({ page }) => {
+  const save = fivePlayerNomination()
+  await page.addInitScript((state) => {
+    localStorage.setItem('sh.game', JSON.stringify(state))
+  }, save)
+  await page.goto('/#/game')
+  await page.getByRole('button', { name: 'Tap to show' }).click()
+  await page.getByRole('button', { name: 'Bob', exact: true }).click()
+  await page.getByRole('button', { name: 'Nominate', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Record the vote' })).toBeVisible()
+
+  const before = await page.evaluate(() => localStorage.getItem('sh.game'))
+  await page.getByRole('button', { name: 'Record approval' }).click()
+  await expect(page.getByRole('dialog').last()).toBeVisible()
+  await page.getByRole('dialog').last().getByRole('button', { name: 'Cancel' }).click()
+
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Record the vote' })).toBeVisible()
+  expect(await page.evaluate(() => localStorage.getItem('sh.game'))).toBe(before)
+})
+
+test('"Confirm routine actions" controls the nomination dialog', async ({ page }) => {
+  const save = fivePlayerNomination()
+  await page.addInitScript((state) => {
+    localStorage.setItem('sh.game', JSON.stringify(state))
+  }, save)
+  const toggle = page.getByRole('switch', { name: 'Confirm routine actions' })
+
+  // Default off: the nomination advances without a dialog.
+  await page.goto('/#/settings')
+  await expect(toggle).toHaveAttribute('aria-checked', 'false')
+  await page.goto('/#/game')
+  await page.getByRole('button', { name: 'Tap to show' }).click()
+  await page.getByRole('button', { name: 'Bob', exact: true }).click()
+  await page.getByRole('button', { name: 'Nominate', exact: true }).click()
+  await expect(page.getByRole('dialog')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Record the vote' })).toBeVisible()
+
+  // Enabled: the same nomination asks first.
+  await page.goto('/#/settings')
+  await page.getByRole('switch', { name: 'Confirm routine actions' }).click()
+  // The hash route does not reload, so reload here to prove the toggle persisted
+  // and to restore the nomination save from the init script.
+  await page.reload()
+  await expect(page.getByRole('switch', { name: 'Confirm routine actions' })).toHaveAttribute('aria-checked', 'true')
+  await page.goto('/#/game')
+  await page.getByRole('button', { name: 'Tap to show' }).click()
+  await page.getByRole('button', { name: 'Bob', exact: true }).click()
+  await page.getByRole('button', { name: 'Nominate', exact: true }).click()
+  await expect(page.getByRole('dialog').last()).toContainText('Nominate Bob?')
+})
+
 test('a five-player game reaches a liberal policy victory', async ({ page }) => {
   const save = fivePlayerNomination()
   await page.addInitScript((state) => {
@@ -331,7 +364,6 @@ test('a five-player game reaches a liberal policy victory', async ({ page }) => 
   for (const chancellor of ['Bob', 'Cara', 'Dan', 'Eve', 'Alice']) {
     await page.getByRole('button', { name: chancellor, exact: true }).click()
     await page.getByRole('button', { name: 'Nominate', exact: true }).click()
-    await confirmWith(page, 'Nominate')
 
     await page.getByRole('button', { name: 'Record approval' }).click()
     await confirmWith(page, 'Confirm approval')
@@ -340,13 +372,11 @@ test('a five-player game reaches a liberal policy victory', async ({ page }) => 
     await page.getByRole('button', { name: 'Reveal cards' }).click()
     await confirmWith(page, /^Yes, reveal to /)
     await page.getByRole('button', { name: 'Fascist policy' }).first().click()
-    await confirmWith(page, 'Discard this policy')
 
     await expect(page.getByRole('dialog', { name: 'Chancellor: enact one policy' })).toBeVisible()
     await page.getByRole('button', { name: 'Reveal cards' }).click()
     await confirmWith(page, /^Yes, reveal to /)
     await page.getByRole('button', { name: 'Liberal policy' }).click()
-    await confirmWith(page, 'Enact this policy')
   }
 
   await expect(page.getByRole('dialog', { name: 'The liberals win' })).toBeVisible()

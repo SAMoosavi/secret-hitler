@@ -103,7 +103,6 @@ async function acknowledgePeek(): Promise<void> {
     title: t('executive.peekDoneTitle'),
     message: t('executive.peekBody'),
     confirmLabel: t('executive.peekDone'),
-    required: true,
   })
   if (ok) emit('acknowledgePeek')
 }
@@ -113,7 +112,6 @@ async function acknowledgeInvestigation(): Promise<void> {
     title: t('executive.resultCloseTitle'),
     message: t('executive.investigationPrivate'),
     confirmLabel: t('executive.closeResult'),
-    required: true,
   })
   if (ok) emit('acknowledgeInvestigation')
 }

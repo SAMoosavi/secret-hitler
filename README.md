@@ -40,7 +40,7 @@ with the command below):
 
 ```
 apk/secret-hitler-companion-0.1.0-arm64-debug.apk   20 MB
-sha256 df5ef46cab9b3c875dfb0522e2b85dbf4703b8eb894ee3a164408c8f8ffccd89
+sha256 effbec6a206c38deea89f1de5a598b5b293874475018362e34583e4d5c289c92
 ```
 
 Install over USB or by opening the file on the device (allow unknown sources):
@@ -123,14 +123,18 @@ src/
   successful transition. Web/e2e use `localStorage` (`sh.game`); the Tauri build
   uses `@tauri-apps/plugin-store`. Unknown/newer schema versions are refused
   without touching the save; malformed phase data loads as corrupt.
-- **Confirm-first:** every state change opens a confirm dialog. Cancel leaves
-  state untouched. Destructive actions (hide role, discard/enact, execute,
-  delete save) are marked as danger. Buttons are disabled while a commit is in
-  flight, so double-taps cannot apply an action twice.
-- **Privacy:** role reveal is pass-the-phone with an explicit "I am …" tap and a
-  confirmation before hiding; policy cards stay face down until "Reveal cards"
-  is confirmed; resuming a save shows a "pass the phone to the operator" cover,
-  and private native dialogs are unmounted until it is dismissed.
+- **Confirm-first where it matters:** destructive or secret actions (exit,
+  delete save, start new game, vote record, revealing a hand, veto, executive
+  targets) always open a confirm dialog. Routine ones (nomination, policy
+  choice, closing an executive result, hiding a revealed role) ask only while
+  **Confirm routine actions** is on — off by default. Cancel leaves state
+  untouched. Buttons are disabled while a commit is in flight, so double-taps
+  cannot apply an action twice.
+- **Privacy:** role reveal is pass-the-phone with an explicit "I am …" tap, then
+  a face-down card the player flips; hiding takes one tap. Policy cards stay
+  face down until "Reveal cards" is confirmed; resuming a save shows a "pass the
+  phone to the operator" cover, and private native dialogs are unmounted until
+  it is dismissed.
 - **Layout:** phone portrait is a single scrolling column; landscape splits the
   board and the action panel side by side, with compact spacing and a
   user-adjustable board scale (85–110%). Minimum touch targets are 48 dp.
@@ -143,8 +147,8 @@ src/
   Hitler; at 5–6 players Hitler also knows the fascists).
 - Election flow: nomination eligibility with disabled reasons, aggregate vote
   entry, tracker and chaos resolution.
-- Legislative session: hidden cards, explicit reveal confirmation, discard and
-  enact confirmation, veto request/response.
+- Legislative session: hidden cards, explicit reveal confirmation, one tap to
+  discard or enact, veto request/response.
 - Executive powers: investigate (never the same player twice), peek three,
   special election, execute — each with a private result and explicit close.
 - Game-over screen for all victory paths with final policy counts.
@@ -156,15 +160,16 @@ src/
 
 Verified in this environment on 2026-10-29:
 
-- `pnpm test` — 51 unit tests pass: role table over 10,000 runs per player
+- `pnpm test` — 52 unit tests pass: role table over 10,000 runs per player
   count, deck/reshuffle, tracker, term limits, veto, powers, all victories, save
-  parsing and phase data validation, i18n key parity, and WCAG AA theme
-  contrast.
-- `pnpm e2e` — 8 Playwright tests pass: setup → reveals → nomination → vote →
-  legislative → reload/resume, duplicate names, newer-save refusal, cancelled
-  role-hide confirmation, Persian RTL/theme persistence, how-to-play, a full
-  five-player UI game to a liberal policy victory, and a 360×640 dp landscape
-  layout with no vertical overflow.
+  parsing and phase data validation, settings migration, i18n key parity, and
+  WCAG AA theme contrast.
+- `pnpm e2e` — 17 Playwright tests pass: setup → reveals → nomination → vote →
+  legislative → reload/resume, duplicate names, newer-save refusal, the
+  face-down/flip role card (pre-flip absence, keyboard, reduced motion, FA/RTL),
+  role-hide and vote-cancel safety, the routine-confirmation toggle, Persian
+  RTL/theme persistence, how-to-play, a full five-player UI game to a liberal
+  policy victory, and 360×640 dp portrait/landscape layouts without overflow.
 - `pnpm build` — typecheck and production build pass.
 - `pnpm check:rust` — the Tauri shell compiles on Linux.
 - Android debug APK — builds and is statically verified as described above.

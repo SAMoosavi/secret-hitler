@@ -73,7 +73,6 @@ async function choose(index: number): Promise<void> {
     }),
     message: t(enact ? 'legislative.enactBody' : 'legislative.discardBody'),
     confirmLabel: t(enact ? 'legislative.chooseEnact' : 'legislative.chooseDiscard'),
-    required: true,
     danger: enact,
   })
   if (!ok) return

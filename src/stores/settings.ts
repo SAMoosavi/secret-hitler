@@ -31,7 +31,7 @@ const defaults = (): Settings => ({
   animations: true,
   orientation: 'landscape',
   privacy: true,
-  confirmReversible: true,
+  confirmReversible: false,
   boardScale: 1,
   autoResume: false,
 })
@@ -67,6 +67,8 @@ export const useSettingsStore = defineStore('settings', () => {
     if (raw) {
       try {
         const parsed: unknown = JSON.parse(raw)
+        const version =
+          isSettings(parsed) && 'settings' in parsed ? Number((parsed as { v?: number }).v) || 0 : 0
         const loaded =
           isSettings(parsed) && 'settings' in parsed ? (parsed as { settings: unknown }).settings : parsed
         if (isSettings(loaded)) {
@@ -76,7 +78,10 @@ export const useSettingsStore = defineStore('settings', () => {
           if (!['dark', 'light'].includes(merged.theme)) merged.theme = 'dark'
           if (!['normal', 'high'].includes(merged.contrast)) merged.contrast = 'normal'
           if (!['auto', 'landscape'].includes(merged.orientation)) merged.orientation = 'landscape'
+          // v2: routine confirmations are off unless the user turns them back on.
+          if (version < 2) merged.confirmReversible = false
           settings.value = merged
+          if (version < 2) persist()
         }
       } catch {
         // A broken settings file falls back to defaults rather than blocking the app.
@@ -86,7 +91,7 @@ export const useSettingsStore = defineStore('settings', () => {
   }
 
   function persist(): void {
-    void storage.set(KEY, JSON.stringify({ v: 1, settings: settings.value }))
+    void storage.set(KEY, JSON.stringify({ v: 2, settings: settings.value }))
   }
 
   function set<K extends keyof Settings>(key: K, value: Settings[K]): void {

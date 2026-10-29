@@ -72,7 +72,6 @@ async function hide(): Promise<void> {
     title: t('reveal.hideTitle'),
     message: isLast ? t('reveal.hideBodyLast') : t('reveal.hideBody'),
     confirmLabel: t('reveal.hideConfirm'),
-    required: true,
     danger: true,
   })
   if (!ok) return

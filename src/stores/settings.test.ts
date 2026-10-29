@@ -21,7 +21,7 @@ describe('settings', () => {
   it('applies defaults to the document', async () => {
     const store = await newStore()
     expect(store.settings.theme).toBe('dark')
-    expect(store.settings.confirmReversible).toBe(true)
+    expect(store.settings.confirmReversible).toBe(false)
     expect(document.documentElement.dataset.theme).toBe('dark')
     expect(document.documentElement.dataset.animations).toBe('on')
   })
@@ -52,5 +52,17 @@ describe('settings', () => {
     const store = await newStore()
     expect(store.settings.boardScale).toBe(1.1)
     expect(store.settings.theme).toBe('dark')
+  })
+
+  it('migrates a v1 save to routine confirmations off, keepable by the user', async () => {
+    localStorage.setItem('sh.settings', '{"v":1,"settings":{"confirmReversible":true,"theme":"light"}}')
+    const migrated = await newStore()
+    expect(migrated.settings.confirmReversible).toBe(false)
+    expect(migrated.settings.theme).toBe('light')
+    expect(JSON.parse(localStorage.getItem('sh.settings') ?? '{}').v).toBe(2)
+
+    migrated.set('confirmReversible', true)
+    const reloaded = await newStore()
+    expect(reloaded.settings.confirmReversible).toBe(true)
   })
 })

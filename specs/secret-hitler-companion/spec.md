@@ -39,7 +39,7 @@ face-to-face discussion, the physical ballot, or the secrecy of the physical car
 - **AC-27** Resume always shows a privacy-safe interstitial ("pass the phone to the operator") before restoring a sensitive phase; no role or card face is visible until confirmed.
 - **AC-28** Save file contains a version number; loading an older version migrates, an unknown/newer version refuses with a readable message, and a corrupted save offers "new game" instead of crashing.
 - **AC-29** Abandon/reset requires a strong confirmation (types or double-confirms a destructive warning), then clears the save and returns to the menu with no resumable game.
-- **AC-30** Every state-changing control opens a Confirm/Cancel dialog first; test asserts cancel leaves the serialized state byte-identical for every mutating action.
+- **AC-30** Destructive or secret controls always open a Confirm/Cancel dialog; routine controls (nomination, policy choice, closing an executive result, hiding a revealed role) ask only while "Confirm routine actions" is enabled (default off). Test asserts cancel leaves the serialized state byte-identical for every action that does ask.
 - **AC-31** Double-tap test: two rapid activations of the same confirm produce exactly one transition; confirm buttons disable while committing.
 - **AC-32** Invalid actions are visibly disabled and non-activating with a reason on tap/long-press; every button in the UI is wired to real behavior (no placeholders).
 - **AC-33** i18n test asserts full FA and EN key parity and zero hardcoded user-facing strings (lint rule or failing test).
@@ -87,7 +87,7 @@ face-to-face discussion, the physical ballot, or the secrecy of the physical car
 - **Official components (verified against secrethitler.com rulebook PDF):** 17 policy tiles (6 liberal, 11 fascist), liberal track of 5, fascist track of 6, election tracker threshold 3, max 10 players, role table per AC-1, board variants per AC-7, veto after the 5th fascist policy.
 - **Rules source of truth:** the official Secret Hitler Standard Edition rules and board tracks; no invented counts, no alternate victory conditions, no silently skipped mandatory rules; ambiguities resolved by the defaults in "Open questions" and recorded in the decision log.
 - **Assets:** original or properly licensed only; no official logo, card art, board scans or rulebook pages; Secret Hitler is CC BY-NC-SA 4.0 (non-commercial) — the project must carry attribution and share-alike notice and stay non-commercial.
-- **UX law:** every mutation is confirm-first, cancel-safe, double-tap-safe; secret data is drawn only on a private screen and erased before the next handoff; the app never claims to verify a physical action.
+- **UX law:** every mutation is cancel-safe and double-tap-safe; destructive or secret mutations are confirm-first, while routine ones confirm only when "Confirm routine actions" is enabled; secret data is drawn only on a private screen and erased before the next handoff; the app never claims to verify a physical action.
 - **Accessibility:** 48 dp targets, AA contrast, no color-only meaning, labeled controls, 200% text scale safety.
 - **i18n:** all user-facing strings externalized; FA is a first-class RTL locale, not a translation overlay; numbers and dates localized.
 - Keep the repo small and readable: no unused scaffolding, no speculative feature flags, no placeholder screens.

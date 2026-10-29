@@ -54,14 +54,13 @@ export async function revealAllRoles(page: Page, names = NAMES): Promise<void> {
   await expect(page.getByRole('heading', { name: 'Nominate a chancellor' })).toBeVisible()
 }
 
-/** Confirms hiding the current role and advances the reveal. */
+/** Hides the current role and advances the reveal (the routine ask is off by default). */
 export async function hideRole(page: Page, last = false): Promise<void> {
   await page
     .getByRole('button', {
       name: last ? 'Hide role and start the game' : 'Hide role and pass on',
     })
     .click()
-  await confirmWith(page, 'Yes, hide role')
 }
 
 /** Clicks confirm in the topmost dialog. */
@@ -75,7 +74,6 @@ export async function electGovernment(page: Page): Promise<void> {
   await eligible.click()
   await expect(page.getByText(/^Choose /)).toBeVisible()
   await page.getByRole('button', { name: 'Nominate', exact: true }).click()
-  await confirmWith(page, 'Nominate')
   await expect(page.getByRole('heading', { name: 'Record the vote' })).toBeVisible()
   await page.getByRole('button', { name: 'Record approval' }).click()
   await confirmWith(page, 'Confirm approval')
