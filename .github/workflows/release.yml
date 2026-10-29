@@ -1,11 +1,11 @@
 name: Release APK
 
-# Every merged PR on develop becomes an installable APK on the Releases page.
+# Every merged PR on main becomes an installable APK on the Releases page.
 # Manual dispatch exists so the workflow can be tried without merging.
 on:
   pull_request:
     types: [closed]
-    branches: [develop]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -23,8 +23,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          # The merge already landed; build the develop tip, not the merge ref.
-          ref: develop
+          # The merge already landed; build the main tip, not the merge ref.
+          ref: main
 
       - uses: pnpm/action-setup@v4
         with:
