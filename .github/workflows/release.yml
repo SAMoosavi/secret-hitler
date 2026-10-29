@@ -1,0 +1,125 @@
+name: Release APK
+
+# Every merged PR on develop becomes an installable APK on the Releases page.
+# Manual dispatch exists so the workflow can be tried without merging.
+on:
+  pull_request:
+    types: [closed]
+    branches: [develop]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-apk
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: github.event_name == 'workflow_dispatch' || github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The merge already landed; build the develop tip, not the merge ref.
+          ref: develop
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.14.0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - name: Install frontend dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Unit tests
+        run: pnpm test
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android
+
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+
+      - name: Install Android SDK packages
+        run: |
+          export ANDROID_HOME="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          test -x "$SDKMANAGER" || SDKMANAGER="$(command -v sdkmanager)"
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" --install "platforms;android-37.0" "build-tools;37.0.0" "ndk;27.2.12479018"
+          echo "ANDROID_HOME=$ANDROID_HOME" >> "$GITHUB_ENV"
+
+      - name: Restore the debug keystore
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_DEBUG_KEYSTORE_BASE64 }}
+        run: |
+          if [ -n "$KEYSTORE_B64" ]; then
+            mkdir -p "$HOME/.android"
+            printf '%s' "$KEYSTORE_B64" | base64 -d > "$HOME/.android/debug.keystore"
+          else
+            echo "::warning::ANDROID_DEBUG_KEYSTORE_BASE64 is unset; this build gets a fresh debug signature and will not install over earlier releases."
+          fi
+
+      - name: Build the APK
+        env:
+          CI: "true"
+        run: |
+          export NDK_HOME="$ANDROID_HOME/ndk/27.2.12479018"
+          export ANDROID_NDK_HOME="$NDK_HOME"
+          export ANDROID_NDK_ROOT="$NDK_HOME"
+          pnpm tauri android build --debug --apk -t aarch64 --ci
+
+      - name: Stage the APK
+        id: apk
+        run: |
+          version=$(node -p "require('./package.json').version")
+          src=src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk
+          test -f "$src"
+          name="secret-hitler-companion-${version}-arm64-debug.apk"
+          cp "$src" "$name"
+          sha256sum "$name" | tee "$name.sha256"
+          {
+            echo "version=$version"
+            echo "name=$name"
+            echo "sha=$(sha256sum "$name" | cut -d' ' -f1)"
+            echo "commit=$(git rev-parse HEAD)"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Publish the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: v${{ steps.apk.outputs.version }}-build.${{ github.run_number }}
+          NAME: ${{ steps.apk.outputs.name }}
+          SHA: ${{ steps.apk.outputs.sha }}
+          COMMIT: ${{ steps.apk.outputs.commit }}
+          PR: ${{ github.event.pull_request.number }}
+        run: |
+          {
+            echo "Offline Secret Hitler companion for the physical board. **Debug-signed, arm64-v8a only, Android 7.0+ (minSdk 24).**"
+            echo
+            echo "**Install:** download \`$NAME\` on the phone, allow installing from this source, then open the file."
+            echo
+            echo "- commit \`$COMMIT\`"
+            if [ -n "$PR" ]; then echo "- merged PR #$PR"; fi
+            echo "- sha256 \`$SHA\`"
+            echo
+            echo "Debug-signed, not a store build, no Internet permission. CI has not run this APK on a device."
+          } > notes.md
+          gh release create "$TAG" "$NAME" "$NAME.sha256" \
+            --target "$COMMIT" \
+            --title "Secret Hitler Companion build $GITHUB_RUN_NUMBER" \
+            --notes-file notes.md

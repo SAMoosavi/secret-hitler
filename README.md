@@ -81,6 +81,40 @@ incremental build can reuse stale dex and produce a 32 MB APK instead of 20 MB.
 **not been launched on a physical device or emulator** — none was available
 here. Runtime behavior on Android is unconfirmed.
 
+### GitHub releases (CI)
+
+`.github/workflows/release.yml` builds the same arm64 debug APK and attaches it
+to a GitHub Release whenever a pull request is **merged into `develop`** (or when
+run manually from the Actions tab). The release tag is
+`v<package version>-build.<run number>` and the assets are
+`secret-hitler-companion-<version>-arm64-debug.apk` plus its `.sha256`.
+
+Install from a release: open the release on the phone, download the APK, allow
+installing from that source, tap the file. It is the same debug-signed build as
+the local `apk/` artifact — arm64-v8a only, Android 7.0+ (`minSdk 24`), no
+Internet permission, not a store build.
+
+CI runs `pnpm install --frozen-lockfile`, `pnpm test`, then
+`pnpm tauri android build --debug --apk -t aarch64` with Node 24, JDK 21, Rust
+stable + `aarch64-linux-android`, Android platform 37.0, build-tools 37.0.0 and NDK
+27.2.12479018. It does not run Playwright (no browser download in CI) and it
+cannot launch the APK.
+
+**Update signature:** the runner generates a fresh Android debug keystore per
+run, so without a stored key each release has a different signature and Android
+refuses to install it over the previous one. Store the local debug keystore once
+as a repository secret (it is not a secret in the security sense — the password
+is the well-known `android` — but it must be the same key every run):
+
+```bash
+base64 -w0 ~/.android/debug.keystore | gh secret set ANDROID_DEBUG_KEYSTORE_BASE64
+```
+
+PRs opened from a fork get a read-only token and cannot publish a release; merge
+from a branch in this repository. The workflow has not been executed here (this
+checkout has no `develop` branch and nothing is pushed), so treat the first run
+as a test.
+
 ### Android hardening (applied in the generated project)
 
 The generated project under `src-tauri/gen/android/` is part of the source:
