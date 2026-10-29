@@ -84,7 +84,7 @@ async function leave(): Promise<boolean> {
   const ok = await confirmAction({
     title: t('setup.backTitle'),
     message: t('setup.backBody'),
-    confirmLabel: t('common.back'),
+    confirmLabel: t('setup.backConfirm'),
     required: true,
     danger: true,
   })
@@ -99,7 +99,7 @@ async function create(): Promise<void> {
   const ok = await confirmAction({
     title: t('setup.confirmTitle'),
     message: t('setup.confirmBody'),
-    confirmLabel: t('setup.start'),
+    confirmLabel: t('setup.confirmStart'),
     required: true,
   })
   if (!ok) return
@@ -114,7 +114,7 @@ onBeforeRouteLeave(async () => {
   const ok = await confirmAction({
     title: t('setup.backTitle'),
     message: t('setup.backBody'),
-    confirmLabel: t('common.back'),
+    confirmLabel: t('setup.backConfirm'),
     required: true,
     danger: true,
   })
@@ -189,7 +189,6 @@ onBeforeRouteLeave(async () => {
               type="text"
               maxlength="24"
               autocomplete="off"
-              :placeholder="t('setup.namePlaceholder', { n: num(index + 1) })"
               :aria-invalid="duplicate !== null"
             />
           </li>

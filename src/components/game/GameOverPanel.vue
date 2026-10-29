@@ -24,9 +24,9 @@ const reason = computed(() => {
 
 async function newGame(): Promise<void> {
   const ok = await confirmAction({
-    title: t('gameOver.newGame'),
-    message: t('setup.confirmBody'),
-    confirmLabel: t('setup.start'),
+    title: t('gameOver.newGameTitle'),
+    message: t('gameOver.newGameBody'),
+    confirmLabel: t('gameOver.newGame'),
     required: true,
   })
   if (!ok) return
@@ -46,7 +46,7 @@ async function newGame(): Promise<void> {
       </span>
       <p class="mt-1 text-sm text-muted">{{ reason }}</p>
       <p class="text-[0.7rem] text-muted">
-        {{ t('game.round', { n: num(state.round) }) }} · {{ num(state.enactedLiberal) }}/{{ num(5) }} {{ t('game.liberal') }} · {{ num(state.enactedFascist) }}/{{ num(6) }} {{ t('game.fascist') }}
+        {{ t('gameOver.summary', { round: num(state.round), liberal: num(state.enactedLiberal), fascist: num(state.enactedFascist) }) }}
       </p>
     </div>
     <div class="mt-3 grid gap-2">

@@ -85,7 +85,7 @@ onBeforeRouteLeave(async (to) => {
   return confirmAction({
     title: t('game.exitTitle'),
     message: t('game.exitBody'),
-    confirmLabel: t('game.menu'),
+    confirmLabel: t('game.exitConfirm'),
     required: true,
     danger: true,
   })

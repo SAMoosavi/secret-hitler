@@ -64,7 +64,7 @@ async function hide(): Promise<void> {
   if (!player.value || game.busy) return
   const ok = await confirmAction({
     title: t('reveal.hideTitle'),
-    message: t('reveal.hideBody'),
+    message: isLast ? t('reveal.hideBodyLast') : t('reveal.hideBody'),
     confirmLabel: t('reveal.hideConfirm'),
     required: true,
     danger: true,
@@ -79,7 +79,7 @@ async function exit(): Promise<void> {
   const ok = await confirmAction({
     title: t('game.exitTitle'),
     message: t('game.exitBody'),
-    confirmLabel: t('game.menu'),
+    confirmLabel: t('game.exitConfirm'),
     required: true,
     danger: true,
   })

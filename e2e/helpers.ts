@@ -23,7 +23,7 @@ export async function createGame(page: Page, names = NAMES): Promise<void> {
 
   const confirm = page.getByRole('dialog').last()
   await expect(confirm).toContainText('Shuffle roles now?')
-  await confirm.getByRole('button', { name: 'Create game' }).click()
+  await confirm.getByRole('button', { name: 'Shuffle and start' }).click()
   await expect(page).toHaveURL(/#\/reveal$/)
 }
 
@@ -63,7 +63,7 @@ export async function electGovernment(page: Page): Promise<void> {
   await page.getByRole('button', { name: 'Nominate', exact: true }).click()
   await confirmWith(page, 'Nominate')
   await expect(page.getByRole('heading', { name: 'Record the vote' })).toBeVisible()
-  await page.getByRole('button', { name: 'Government approved' }).click()
+  await page.getByRole('button', { name: 'Record approval' }).click()
   await confirmWith(page, 'Confirm approval')
   await expect(page.getByRole('dialog', { name: 'President: discard one policy' })).toBeVisible()
 }

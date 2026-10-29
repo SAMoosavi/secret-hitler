@@ -88,9 +88,9 @@ async function choose(player: Player): Promise<void> {
 
 async function revealPeek(): Promise<void> {
   const ok = await confirmAction({
-    title: t('executive.peekTitle'),
+    title: t('executive.peekConfirmTitle'),
     message: t('executive.peekHint'),
-    confirmLabel: t('common.reveal'),
+    confirmLabel: t('executive.peekConfirm'),
     required: true,
   })
   if (!ok) return
@@ -100,9 +100,9 @@ async function revealPeek(): Promise<void> {
 
 async function acknowledgePeek(): Promise<void> {
   const ok = await confirmAction({
-    title: t('executive.peekAck'),
+    title: t('executive.peekDoneTitle'),
     message: t('executive.peekBody'),
-    confirmLabel: t('common.continue'),
+    confirmLabel: t('executive.peekDone'),
     required: true,
   })
   if (ok) emit('acknowledgePeek')
@@ -110,8 +110,8 @@ async function acknowledgePeek(): Promise<void> {
 
 async function acknowledgeInvestigation(): Promise<void> {
   const ok = await confirmAction({
-    title: t('executive.resultTitle'),
-    message: t('executive.closeResult'),
+    title: t('executive.resultCloseTitle'),
+    message: t('executive.investigationPrivate'),
     confirmLabel: t('executive.closeResult'),
     required: true,
   })

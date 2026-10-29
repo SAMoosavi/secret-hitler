@@ -139,7 +139,7 @@ test('a five-player game reaches a liberal policy victory', async ({ page }) => 
     await page.getByRole('button', { name: 'Nominate', exact: true }).click()
     await confirmWith(page, 'Nominate')
 
-    await page.getByRole('button', { name: 'Government approved' }).click()
+    await page.getByRole('button', { name: 'Record approval' }).click()
     await confirmWith(page, 'Confirm approval')
 
     await expect(page.getByRole('dialog', { name: 'President: discard one policy' })).toBeVisible()
@@ -156,10 +156,10 @@ test('a five-player game reaches a liberal policy victory', async ({ page }) => 
   }
 
   await expect(page.getByRole('dialog', { name: 'The liberals win' })).toBeVisible()
-  await expect(page.getByText('Five liberal policies were enacted.', { exact: true })).toBeVisible()
+  await expect(page.getByText('5 liberal policies were enacted.', { exact: true })).toBeVisible()
 
-  await page.getByRole('button', { name: 'New game' }).click()
-  await confirmWith(page, 'Create game')
+  await page.getByRole('button', { name: 'Start new game' }).click()
+  await confirmWith(page, 'Start new game')
   await expect(page).toHaveURL(/#\/setup$/)
   await expect(page.getByRole('heading', { name: 'How many players?' })).toBeVisible()
 })

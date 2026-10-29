@@ -35,11 +35,12 @@ test setup usable offline. The suite runs `pnpm build` + `vite preview` itself.
 
 ### Android APK
 
-A debug-signed, installable APK is built and checked into `apk/`:
+A debug-signed, installable APK is built locally into `apk/` (gitignored — rebuild
+with the command below):
 
 ```
 apk/secret-hitler-companion-0.1.0-arm64-debug.apk   20 MB
-sha256 a8e7a3320b07b6fb2c7d8d86f62094a915bcd21fcde45ac3851f7e55582064b3
+sha256 497e8f274a1ab361fc16c39c834dbe99f59c1041982f91ed6684e5cf032dee6b
 ```
 
 Install over USB or by opening the file on the device (allow unknown sources):
@@ -73,6 +74,9 @@ Output: `src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-univers
 (copied to `apk/`). For a release APK, run the same command without `--debug`
 and sign the unsigned output with your own keystore.
 
+Run `./gradlew clean` in `src-tauri/gen/android/` before rebuilding: an
+incremental build can reuse stale dex and produce a 32 MB APK instead of 20 MB.
+
 **Blank-check caveat:** the APK was built and statically verified, but it has
 **not been launched on a physical device or emulator** — none was available
 here. Runtime behavior on Android is unconfirmed.
@@ -83,7 +87,9 @@ The generated project under `src-tauri/gen/android/` is part of the source:
 
 1. **Screenshots blocked (AC-45).** `MainActivity.kt` sets
    `WindowManager.LayoutParams.FLAG_SECURE`, which blocks screenshots and hides
-   the recent-apps thumbnail.
+   the recent-apps thumbnail. Kotlin inlines the constant, so the built dex shows
+   `const/16 8192` + `Window.setFlags` rather than the field name (checked with
+   `dexdump` on `classes6.dex`).
 2. **No network.** `AndroidManifest.xml` has no `INTERNET` permission, and the
    capability file grants only `core:default` and `store:default`.
 3. **iOS:** there is no direct `FLAG_SECURE` equivalent. Use an opaque overlay
