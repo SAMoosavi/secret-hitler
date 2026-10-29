@@ -110,6 +110,10 @@ is the well-known `android` — but it must be the same key every run):
 base64 -w0 ~/.android/debug.keystore | gh secret set ANDROID_DEBUG_KEYSTORE_BASE64
 ```
 
+The workflow restores the key to both `~/.android` and `$XDG_CONFIG_HOME/.android`
+(where AGP looks on Linux) and refuses to publish if the built APK is signed by
+any other key.
+
 PRs opened from a fork get a read-only token and cannot publish a release; merge
 from a branch in this repository. The first run after this workflow landed is
 the test: it was written but never executed locally.
