@@ -1,4 +1,4 @@
-# Secret Hitler Companion
+# Secret Hitler: Extended Edition
 
 An offline, pass-and-play companion for the physical **Secret Hitler** board
 game. The app handles secret role distribution, elections, policy tracking, and
@@ -43,11 +43,11 @@ Install by opening the release on the phone, downloading the APK, allowing
 installs from that source, and tapping the file. For a USB install:
 
 ```bash
-adb install -r secret-hitler-companion-0.2.0-arm64-release.apk
+adb install -r secret-hitler-companion-0.4.0-arm64-release.apk
 ```
 
-What the artifact is: package `app.secrethitler.companion`, version `0.2.0`
-(versionCode 2000), `minSdk 24`, `targetSdk 37`, native code for **`arm64-v8a`
+What the artifact is: package `app.secrethitler.companion`, version `0.4.0`
+(versionCode 4000), `minSdk 24`, `targetSdk 37`, native code for **`arm64-v8a`
 only** (no x86_64 emulator build), R8-minified and **not debuggable** — a real
 release build. It is signed with the project's Android **debug** key (same
 certificate as the earlier debug builds) so it installs over them; it is still
@@ -57,7 +57,7 @@ Static checks on the published file:
 
 - `apksigner verify --print-certs` — v2 scheme, cert SHA-256 `da9d93d2…cfd2`
   (the workflow refuses to publish a different key).
-- `aapt2 dump badging` — package/version `0.2.0` (versionCode 2000),
+- `aapt2 dump badging` — package/version `0.4.0` (versionCode 4000),
   `minSdkVersion 24`, `targetSdkVersion 37`, `native-code: 'arm64-v8a'`, no
   `debuggable` flag, and no `android.permission.INTERNET`.
 - The frontend bundle and Vazirmatn fonts are embedded in
@@ -264,9 +264,10 @@ are covered by evidence.
 
 ## Assets and attribution
 
-- App icon and all in-app artwork are original SVG/PNG assets created for this
-  project (`src-tauri/app-icon.svg`, generated icons under `src-tauri/icons/`).
-  No official game artwork, logos, or card scans are used.
+- The app icon is the project owner's own artwork (`src-tauri/app-icon.png`);
+  platform icons under `src-tauri/icons/` are generated from it with
+  `pnpm tauri icon`. In-app artwork is original SVG. No official game artwork,
+  logos, or card scans are used.
 - **Vazirmatn** font by Saber Rastikerdar, SIL Open Font License 1.1. Files and
   license: `src/assets/fonts/` (see its `README.md` and `OFL-1.1.txt`).
 - Rules text is an original summary of the publicly available rulebook; game

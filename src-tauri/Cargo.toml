@@ -1,6 +1,6 @@
 [package]
 name = "secret-hitler-companion"
-version = "0.3.0"
+version = "0.4.0"
 description = "Offline companion for the physical Secret Hitler board game"
 authors = ["Secret Hitler Companion contributors"]
 edition = "2021"

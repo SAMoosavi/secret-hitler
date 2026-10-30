@@ -1,5 +1,5 @@
 export default {
-  appTitle: 'Secret Hitler',
+  appTitle: 'Secret Hitler: Extended Edition',
   appSubtitle: 'Companion for the physical board game',
   appTagline: 'Pass the phone. Trust no one.',
   common: {

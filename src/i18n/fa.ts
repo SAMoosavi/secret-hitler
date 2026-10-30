@@ -1,7 +1,7 @@
 import en from './en'
 
 const fa: typeof en = {
-  appTitle: 'هیتلر مخفی',
+  appTitle: 'هیتلر مخفی: نسخه گسترده',
   appSubtitle: 'همراه بازی رومیزی فیزیکی',
   appTagline: 'گوشی را بدهید. به هیچ‌کس اعتماد نکنید.',
   common: {
