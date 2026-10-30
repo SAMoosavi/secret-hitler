@@ -20,6 +20,7 @@ const sections = [
   ['vetoTitle', 'veto'],
   ['victoryTitle', 'victory'],
   ['hitlerTitle', 'hitler'],
+  ['smallTitle', 'small'],
   ['expansionTitle', 'expansion'],
   ['expansionRolesTitle', 'expansionRoles'],
   ['expansionDeckTitle', 'expansionDeck'],

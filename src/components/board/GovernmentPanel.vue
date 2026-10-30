@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import AppIcon from '../base/AppIcon.vue'
 import ElectionTracker from './ElectionTracker.vue'
 import { formatNumber } from '../../i18n/format'
+import { fascistTrackFor, liberalTrackFor } from '../../game/constants'
 import type { PublicView } from '../../game/types'
 
 const props = defineProps<{ view: PublicView }>()
@@ -72,11 +73,11 @@ const electionText = computed(() => {
       <span class="chip !py-0.5">{{ t(`phases.${view.phase}`) }}</span>
       <span class="chip !py-0.5">
         <AppIcon name="sun" :size="11" class="text-liberal" />
-        {{ num(view.enactedLiberal) }}/{{ num(5) }}
+        {{ num(view.enactedLiberal) }}/{{ num(liberalTrackFor(view.playerCount)) }}
       </span>
       <span class="chip !py-0.5">
         <AppIcon name="crest" :size="11" class="text-fascist" />
-        {{ num(view.enactedFascist) }}/{{ num(6) }}
+        {{ num(view.enactedFascist) }}/{{ num(fascistTrackFor(view.playerCount)) }}
       </span>
     </div>
   </section>

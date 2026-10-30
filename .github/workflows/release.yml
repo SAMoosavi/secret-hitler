@@ -136,5 +136,5 @@ jobs:
           } > notes.md
           gh release create "$TAG" "$NAME" "$NAME.sha256" \
             --target "$COMMIT" \
-            --title "Secret Hitler Companion build $GITHUB_RUN_NUMBER" \
+            --title "${{ steps.apk.outputs.version }}" \
             --notes-file notes.md

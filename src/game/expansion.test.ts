@@ -99,7 +99,7 @@ function legislative(
 
 describe('expansion role table', () => {
   it('adds the 11-13 rows with exactly one Hitler each', () => {
-    expect(MIN_PLAYERS).toBe(5)
+    expect(MIN_PLAYERS).toBe(4)
     expect(MAX_PLAYERS).toBe(13)
     expect(EXPANSION_MIN).toBe(11)
     expect(ROLE_TABLE[11]).toEqual({ liberal: 5, fascist: 3, communist: 2, hitler: 1 })
@@ -115,7 +115,7 @@ describe('expansion role table', () => {
     expect(validateSetup({ playerCount: 11, names: names(11) })).toBeNull()
     expect(validateSetup({ playerCount: 14, names: names(14) })).toEqual({
       code: 'invalidPlayerCount',
-      params: { min: 5, max: 13 },
+      params: { min: 4, max: 13 },
     })
   })
 
@@ -146,7 +146,7 @@ describe('deck recipe', () => {
     expect(COMMUNIST_TRACK).toBe(6)
     expect(COMMUNIST_DECK).toEqual({ liberal: 5, fascist: 10, communist: 8 })
 
-    for (const count of [5, 6, 7, 8, 9, 10]) {
+    for (const count of [4, 5, 6, 7, 8, 9, 10]) {
       expect(deckRecipeFor(count)).toEqual({ liberal: 6, fascist: 11, communist: 0 })
     }
     for (const count of [11, 12, 13]) {
@@ -158,7 +158,7 @@ describe('deck recipe', () => {
   })
 
   it('builds 17 tiles at 5-10 and the 23-tile XL deck at 11-13', () => {
-    for (const count of [5, 6, 7, 8, 9, 10]) {
+    for (const count of [4, 5, 6, 7, 8, 9, 10]) {
       const deck = makeDeck(count)
       expect(deck).toHaveLength(DECK_TOTAL)
       expect(deck.filter((card) => card === 'liberal')).toHaveLength(DECK_LIBERAL)
@@ -200,7 +200,7 @@ describe('deck recipe', () => {
 
 describe('party assignment', () => {
   it('derives each saved party from its role and marks 11-13 as the expansion', () => {
-    for (const count of [5, 10, 11, 12, 13]) {
+    for (const count of [4, 5, 10, 11, 12, 13]) {
       const state = created(count)
       for (const player of state.players) {
         expect(player.party).toBe(partyForRole(player.role))

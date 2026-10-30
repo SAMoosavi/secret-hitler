@@ -115,6 +115,42 @@ test('duplicate names block the setup wizard', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeEnabled()
 })
 
+test('the four-player house variant runs on the short tracks', async ({ page }) => {
+  const names = NAMES.slice(0, 4)
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Start game' }).click()
+  await page.getByRole('button', { name: '4 players, house variant' }).click()
+  await expect(page.getByText('House variant', { exact: true })).toBeVisible()
+  await page.getByRole('button', { name: 'Next', exact: true }).click()
+
+  for (const [index, name] of names.entries()) {
+    await page.getByLabel(`Player ${index + 1}`, { exact: true }).fill(name)
+  }
+  await page.getByRole('button', { name: 'Next', exact: true }).click()
+
+  await expect(page.getByRole('heading', { name: 'Role distribution' })).toBeVisible()
+  await expect(page.getByText('House variant: two liberals against one fascist and Hitler.')).toBeVisible()
+
+  await page.getByRole('button', { name: 'Next', exact: true }).click()
+  await expect(page.getByText('The 4-player board has 4 liberal spaces and 5 fascist spaces')).toBeVisible()
+
+  await page.getByRole('button', { name: 'Next', exact: true }).click()
+  await expect(page.getByText('Board variant: 4 players (house variant)')).toBeVisible()
+  await page.getByRole('button', { name: 'Create game' }).click()
+  await confirmWith(page, 'Shuffle and start')
+
+  await revealAllRoles(page, names)
+  await expect(
+    page.getByRole('region', { name: 'Liberal policies' }).locator('.track-space'),
+  ).toHaveCount(4)
+  await expect(
+    page.getByRole('region', { name: 'Fascist policies' }).locator('.track-space'),
+  ).toHaveCount(5)
+  // The government chips must quote the same maxima as the tracks.
+  await expect(page.getByText('0/4', { exact: true })).toBeVisible()
+  await expect(page.getByText('0/5', { exact: true })).toBeVisible()
+})
+
 test('a newer save is refused without touching the game', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem('sh.game', JSON.stringify({ schemaVersion: 99 }))

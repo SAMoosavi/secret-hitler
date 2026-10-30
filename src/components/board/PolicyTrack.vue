@@ -5,9 +5,9 @@ import AppIcon from '../base/AppIcon.vue'
 import type { IconName } from '../base/icons'
 import {
   COMMUNIST_TRACK,
-  FASCIST_TRACK,
-  LIBERAL_TRACK,
   communistPowerFor,
+  fascistTrackFor,
+  liberalTrackFor,
   powerFor,
 } from '../../game/constants'
 import { formatNumber } from '../../i18n/format'
@@ -23,8 +23,8 @@ const { t, locale } = useI18n()
 const num = (value: number): string => formatNumber(value, locale.value)
 
 const total = computed(() => {
-  if (props.kind === 'liberal') return LIBERAL_TRACK
-  return props.kind === 'fascist' ? FASCIST_TRACK : COMMUNIST_TRACK
+  if (props.kind === 'liberal') return liberalTrackFor(props.playerCount)
+  return props.kind === 'fascist' ? fascistTrackFor(props.playerCount) : COMMUNIST_TRACK
 })
 const title = computed(() => {
   if (props.kind === 'liberal') return t('game.liberalTrack')

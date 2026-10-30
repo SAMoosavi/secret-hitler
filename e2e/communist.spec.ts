@@ -987,6 +987,6 @@ test('how-to-play covers the expansion and keeps the 5–10 rules', async ({ pag
   const distribution = sectionFor('Distribution')
   await expect(distribution).toContainText('5 players: 3 liberals, 1 fascist, 1 Hitler.')
   await expect(distribution).toContainText('10: 6/3/1.')
-  await expect(sectionFor('Roles and teams')).toContainText('5–6 player games')
+  await expect(sectionFor('Roles and teams')).toContainText('4–6 player games')
   await expect(sectionFor('Setup')).toContainText('6 liberal and 11 fascist policy tiles')
 })

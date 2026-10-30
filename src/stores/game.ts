@@ -4,10 +4,10 @@ import { createGame, selectPublicView, transition } from '../game/engine'
 import {
   COMMUNIST_TRACK,
   EXPANSION_MIN,
-  FASCIST_TRACK,
-  LIBERAL_TRACK,
   MAX_PLAYERS,
   MIN_PLAYERS,
+  fascistTrackFor,
+  liberalTrackFor,
   partyForRole,
   roleCounts,
 } from '../game/constants'
@@ -245,8 +245,8 @@ export function parseSave(raw: string): Parsed {
   }
   // A full track means that ending has already fired, so the game must be over.
   const trackFull =
-    (migrated.enactedLiberal as number) >= LIBERAL_TRACK ||
-    (migrated.enactedFascist as number) >= FASCIST_TRACK ||
+    (migrated.enactedLiberal as number) >= liberalTrackFor(players.length) ||
+    (migrated.enactedFascist as number) >= fascistTrackFor(players.length) ||
     (!isBase && (migrated.enactedCommunist as number) >= COMMUNIST_TRACK)
   if (trackFull && migrated.phase !== 'gameOver') return { error: 'corrupt' }
   if (migrated.investigation !== null) {

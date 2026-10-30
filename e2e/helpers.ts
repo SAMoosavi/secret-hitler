@@ -27,7 +27,9 @@ export async function createGame(page: Page, names = NAMES): Promise<void> {
   const countLabel =
     names.length >= 11
       ? `${names.length} players, Communist expansion`
-      : `${names.length} players`
+      : names.length === 4
+        ? `${names.length} players, house variant`
+        : `${names.length} players`
   await page.getByRole('button', { name: countLabel }).click()
   await page.getByRole('button', { name: 'Next', exact: true }).click()
 

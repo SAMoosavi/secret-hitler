@@ -299,7 +299,7 @@ describe('v2 expansion saves', () => {
     expect(ROLE_TABLE[11]).toEqual({ liberal: 5, fascist: 3, communist: 2, hitler: 1 })
     expect(ROLE_TABLE[12]).toEqual({ liberal: 6, fascist: 3, communist: 2, hitler: 1 })
     expect(ROLE_TABLE[13]).toEqual({ liberal: 6, fascist: 3, communist: 3, hitler: 1 })
-    for (const count of [5, 6, 7, 8, 9, 10, 11, 12, 13]) {
+    for (const count of [4, 5, 6, 7, 8, 9, 10, 11, 12, 13]) {
       const state = created(count)
       const parsed = parseSave(JSON.stringify(state))
       if ('error' in parsed) throw new Error(`${count}: ${parsed.error}`)

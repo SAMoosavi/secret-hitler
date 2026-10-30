@@ -10,9 +10,9 @@ import { useGameStore } from '../../stores/game'
 import { formatNumber } from '../../i18n/format'
 import {
   COMMUNIST_TRACK,
-  FASCIST_TRACK,
-  LIBERAL_TRACK,
+  fascistTrackFor,
   isExpansion,
+  liberalTrackFor,
 } from '../../game/constants'
 import type { GameState, Party, Role } from '../../game/types'
 
@@ -45,8 +45,16 @@ const skin = computed(() => SKINS[kind.value])
 const title = computed(() => t(TITLES[kind.value]))
 const expansion = computed(() => isExpansion(props.state.playerCount))
 const totals = computed(() => [
-  { key: 'game.liberalTrack', value: props.state.enactedLiberal, max: LIBERAL_TRACK },
-  { key: 'game.fascistTrack', value: props.state.enactedFascist, max: FASCIST_TRACK },
+  {
+    key: 'game.liberalTrack',
+    value: props.state.enactedLiberal,
+    max: liberalTrackFor(props.state.playerCount),
+  },
+  {
+    key: 'game.fascistTrack',
+    value: props.state.enactedFascist,
+    max: fascistTrackFor(props.state.playerCount),
+  },
   { key: 'gameOver.totalCommunist', value: props.state.enactedCommunist, max: COMMUNIST_TRACK },
 ])
 const ROLE_KEYS: Record<Role, string> = {
@@ -62,7 +70,9 @@ const PARTY_KEYS: Record<Party, string> = {
 }
 const reason = computed(() => {
   const key = over.value?.reason
-  return key ? t(`gameOver.${key}`) : ''
+  if (!key) return ''
+  const count = key === 'liberalPolicies' ? props.state.enactedLiberal : props.state.enactedFascist
+  return t(`gameOver.${key}`, { count: num(count) })
 })
 
 async function newGame(): Promise<void> {
@@ -95,7 +105,13 @@ async function newGame(): Promise<void> {
       <p class="mt-1 text-sm text-muted">{{ reason }}</p>
 
       <p v-if="!expansion" class="text-[0.7rem] text-muted">
-        {{ t('gameOver.summary', { round: num(state.round), liberal: num(state.enactedLiberal), fascist: num(state.enactedFascist) }) }}
+        {{ t('gameOver.summary', {
+          round: num(state.round),
+          liberal: num(state.enactedLiberal),
+          liberalMax: num(liberalTrackFor(state.playerCount)),
+          fascist: num(state.enactedFascist),
+          fascistMax: num(fascistTrackFor(state.playerCount)),
+        }) }}
       </p>
       <template v-else>
         <p class="text-[0.7rem] text-muted">{{ t('game.round', { n: num(state.round) }) }}</p>
