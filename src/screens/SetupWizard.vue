@@ -9,13 +9,14 @@ import { useGameStore } from '../stores/game'
 import { formatNumber } from '../i18n/format'
 import {
   COMMUNIST_TRACK,
-  FASCIST_TRACK,
   HAND_SIZE,
-  LIBERAL_TRACK,
   MAX_PLAYERS,
   MIN_PLAYERS,
   deckRecipeFor,
+  fascistTrackFor,
   isExpansion,
+  isSmallTable,
+  liberalTrackFor,
   roleCounts,
 } from '../game/constants'
 
@@ -43,11 +44,15 @@ const steps = computed(() => [
   t('setup.stepReview'),
 ])
 const expansion = computed(() => isExpansion(count.value))
+const smallTable = computed(() => isSmallTable(count.value))
+const liberalTrack = computed(() => liberalTrackFor(count.value))
+const fascistTrack = computed(() => fascistTrackFor(count.value))
 const recipe = computed(() => deckRecipeFor(count.value))
 const deckTotal = computed(
   () => recipe.value.liberal + recipe.value.fascist + recipe.value.communist,
 )
 const variant = computed(() => {
+  if (smallTable.value) return t('setup.variantSmall')
   if (expansion.value) return t('setup.variant', { min: num(9), max: num(10) })
   const min = count.value <= 6 ? 5 : count.value <= 8 ? 7 : 9
   return t('setup.variant', { min: num(min), max: num(min + 1) })
@@ -187,7 +192,11 @@ onBeforeRouteLeave(async () => {
             :class="count === n ? '!border-gold ring-2 ring-gold/40' : ''"
             :aria-pressed="count === n"
             :aria-label="
-              isExpansion(n) ? t('setup.countExpansionA11y', { count: num(n) }) : undefined
+              isExpansion(n)
+                ? t('setup.countExpansionA11y', { count: num(n) })
+                : isSmallTable(n)
+                  ? t('setup.countSmallA11y', { count: num(n) })
+                  : undefined
             "
             @click="count = n"
           >
@@ -197,11 +206,18 @@ onBeforeRouteLeave(async () => {
               :size="12"
               class="absolute end-1.5 top-1.5 text-gold"
             />
+            <AppIcon
+              v-else-if="isSmallTable(n)"
+              name="user"
+              :size="12"
+              class="absolute end-1.5 top-1.5 text-gold"
+            />
             <span class="text-2xl font-bold">{{ num(n) }}</span>
             <span class="text-[0.65rem] text-muted">{{ t('common.players') }}</span>
           </button>
         </div>
         <p v-if="expansion" class="mt-2 chip">{{ t('setup.expansionChip') }}</p>
+        <p v-if="smallTable" class="mt-2 chip">{{ t('setup.smallTableChip') }}</p>
         <p class="mt-3 rounded-lg border border-line bg-surface-2/60 p-2.5 text-xs text-muted">
           {{ t('setup.playersMin') }}
         </p>
@@ -233,7 +249,9 @@ onBeforeRouteLeave(async () => {
 
       <section v-else-if="step === 2">
         <h2 class="text-2xl font-bold">{{ t('setup.rolesTitle') }}</h2>
-        <p class="mt-1 text-sm text-muted">{{ t('setup.rolesHint', { count: num(count) }) }}</p>
+        <p class="mt-1 text-sm text-muted">
+          {{ smallTable ? t('setup.rolesHintSmall', { count: num(count) }) : t('setup.rolesHint', { count: num(count) }) }}
+        </p>
         <div class="mt-4 grid gap-2">
           <div class="panel flex items-center justify-between gap-2 p-3">
             <span class="flex items-center gap-2 font-bold">
@@ -266,6 +284,9 @@ onBeforeRouteLeave(async () => {
         </div>
         <p class="mt-3 rounded-lg border border-line bg-surface-2/60 p-2.5 text-xs text-muted">
           {{ count <= 6 ? t('setup.knowledgeFive') : t('setup.knowledgeMany') }}
+        </p>
+        <p v-if="smallTable" class="mt-2 rounded-lg border border-line bg-surface-2/60 p-2.5 text-xs text-muted">
+          {{ t('setup.smallRolesHint') }}
         </p>
         <p v-if="expansion" class="mt-2 rounded-lg border border-line bg-surface-2/60 p-2.5 text-xs text-muted">
           {{ t('setup.expansionRolesHint') }}
@@ -301,7 +322,7 @@ onBeforeRouteLeave(async () => {
                 <AppIcon name="sun" :size="18" class="text-liberal" />
                 {{ t('setup.liberals') }}
               </dt>
-              <dd class="text-xl font-bold">{{ num(LIBERAL_TRACK) }}</dd>
+              <dd class="text-xl font-bold">{{ num(liberalTrack) }}</dd>
             </div>
             <div class="panel flex items-center justify-between gap-3 p-3">
               <dt class="flex items-center gap-2 font-bold">
@@ -309,7 +330,7 @@ onBeforeRouteLeave(async () => {
                 {{ t('setup.fascists') }}
               </dt>
               <dd class="text-end">
-                <span class="block text-xl font-bold">{{ num(FASCIST_TRACK) }}</span>
+                <span class="block text-xl font-bold">{{ num(fascistTrack) }}</span>
                 <span class="block text-[0.65rem] text-muted">{{ t('setup.fascistBoard910') }}</span>
               </dd>
             </div>
@@ -361,6 +382,9 @@ onBeforeRouteLeave(async () => {
           <p class="mt-3 rounded-lg border border-gold/40 bg-gold/10 p-3 text-sm">
             {{ t('setup.physicalNote') }}
           </p>
+          <p v-if="smallTable" class="mt-2 rounded-lg border border-line bg-surface-2/60 p-2.5 text-xs text-muted">
+            {{ t('setup.smallBoardNote') }}
+          </p>
         </template>
       </section>
 
@@ -370,6 +394,9 @@ onBeforeRouteLeave(async () => {
         <div class="panel mt-4 divide-y divide-line">
           <p v-if="expansion" class="p-3">
             <span class="chip">{{ t('setup.reviewExpansion') }}</span>
+          </p>
+          <p v-if="smallTable" class="p-3">
+            <span class="chip">{{ t('setup.smallTableChip') }}</span>
           </p>
           <div class="flex items-center justify-between gap-2 p-3">
             <span class="text-sm text-muted">{{ t('setup.stepPlayers') }}</span>

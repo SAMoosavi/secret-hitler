@@ -1,10 +1,14 @@
 import type { Party, Power, Role } from './types'
 
-export const MIN_PLAYERS = 5
+export const MIN_PLAYERS = 4
 export const MAX_PLAYERS = 13
+/** Fan-made small-table house variant; every other count keeps the official rules. */
+export const SMALL_TABLE_MAX = 4
 export const EXPANSION_MIN = 11
 export const LIBERAL_TRACK = 5
 export const FASCIST_TRACK = 6
+export const SMALL_LIBERAL_TRACK = 4
+export const SMALL_FASCIST_TRACK = 5
 export const COMMUNIST_TRACK = 6
 export const TRACKER_MAX = 3
 export const DECK_LIBERAL = 6
@@ -30,6 +34,7 @@ export interface RoleCounts {
 }
 
 export const ROLE_TABLE: Record<number, RoleCounts> = {
+  4: { liberal: 2, fascist: 1, hitler: 1 },
   5: { liberal: 3, fascist: 1, hitler: 1 },
   6: { liberal: 4, fascist: 1, hitler: 1 },
   7: { liberal: 4, fascist: 2, hitler: 1 },
@@ -46,6 +51,7 @@ export const ROLE_TABLE: Record<number, RoleCounts> = {
  * the fascist victory and never has a power. Standard Edition boards.
  */
 export const BOARD_POWERS: Record<number, Power[]> = {
+  4: ['none', 'none', 'peek', 'execute'],
   5: ['none', 'none', 'peek', 'execute', 'execute'],
   6: ['none', 'none', 'peek', 'execute', 'execute'],
   7: ['none', 'investigate', 'special', 'execute', 'execute'],
@@ -68,6 +74,18 @@ export function isExpansion(playerCount: number): boolean {
   return playerCount >= EXPANSION_MIN && playerCount <= MAX_PLAYERS
 }
 
+export function isSmallTable(playerCount: number): boolean {
+  return playerCount >= MIN_PLAYERS && playerCount <= SMALL_TABLE_MAX
+}
+
+export function liberalTrackFor(playerCount: number): number {
+  return isSmallTable(playerCount) ? SMALL_LIBERAL_TRACK : LIBERAL_TRACK
+}
+
+export function fascistTrackFor(playerCount: number): number {
+  return isSmallTable(playerCount) ? SMALL_FASCIST_TRACK : FASCIST_TRACK
+}
+
 export function partyForRole(role: Role): Party {
   if (role === 'liberal') return 'liberal'
   if (role === 'communist') return 'communist'
@@ -85,7 +103,7 @@ export function deckRecipeFor(playerCount: number): DeckRecipe {
 }
 
 export function powerFor(playerCount: number, fascistPolicy: number): Power {
-  if (fascistPolicy < 1 || fascistPolicy >= FASCIST_TRACK) return 'none'
+  if (fascistPolicy < 1 || fascistPolicy >= fascistTrackFor(playerCount)) return 'none'
   return BOARD_POWERS[Math.min(playerCount, 10)]?.[fascistPolicy - 1] ?? 'none'
 }
 

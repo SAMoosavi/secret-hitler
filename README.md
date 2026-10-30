@@ -154,10 +154,11 @@ src/
 ```
 
 - **Rules engine** (`src/game/engine.ts`): a reducer, `transition(state, action,
-  rng)`, covering role tables for 5–13 players, term limits (including the
-  exactly-five-player exception), election tracker/chaos, veto after the fifth
-  fascist policy, all four executive powers, special elections, and every
-  victory path. At 11–13 players it also runs the fan-made Communist expansion
+  rng)`, covering role tables for 4–13 players, term limits (including the
+  exactly-five-survivors exception), election tracker/chaos, veto after the
+  fifth fascist policy, all four executive powers, special elections, and every
+  victory path. At 4 players it runs a fan-made house variant with 2 liberals,
+  1 fascist and Hitler on a 4-space liberal and 5-space fascist track. At 11–13 players it also runs the fan-made Communist expansion
   (`src/game/expansion.ts`): a third party, a shared Communist policy track,
   Radicalisation, Confession, Five-Year Plan, and the joint Hitler-execution
   victory. All randomness is injected (`Rng`), so tests are deterministic.
@@ -187,10 +188,11 @@ src/
 
 ## Features
 
-- Setup wizard for 5–13 players with duplicate-name blocking and a role/board
-  review. The Communist expansion switches on automatically at 11–13 players.
+- Setup wizard for 4–13 players with duplicate-name blocking and a role/board
+  review. The 4-player house variant and the 11–13 player Communist expansion
+  switch on automatically by player count.
 - Secret role reveal with per-player knowledge (fascists know each other and
-  Hitler; at 5–6 players Hitler also knows the fascists). At 11–13 players
+  Hitler; at 4–6 players Hitler also knows the fascists). At 11–13 players
   Communists know each other and their secret step; fascists do not see them.
 - Election flow: nomination eligibility with disabled reasons, aggregate vote
   entry, tracker and chaos resolution.
@@ -202,6 +204,9 @@ src/
   policies), a separate Communist track with its own powers, the secret
   Radicalisation and Confession steps, Five-Year Plan, and the joint
   Hitler-execution victory for Communists and Liberals.
+- 4-player house variant: 2 liberals against 1 fascist and Hitler, a 17-tile
+  deck, 4 liberal / 5 fascist policy victories, a four-power fascist board
+  (blank, blank, peek, execute — no investigation) and no veto.
 - Game-over screen for all victory paths with final policy counts.
 - English/Persian, dark/light/high-contrast themes, RTL, Persian digits,
   sound/haptics/animation switches, board scale, orientation preference.
@@ -211,13 +216,15 @@ src/
 
 Verified in this environment on 2026-10-30:
 
-- `pnpm test` — 138 unit tests pass: role table over 10,000 runs per player
-  count, deck/reshuffle, tracker, term limits, veto, powers, all victories,
-  expansion rules (Communist track, Radicalisation, Confession, Five-Year Plan,
-  joint victory), public-view privacy, save v1→v2 migration and phase data
-  validation, settings migration, i18n key parity, and WCAG AA theme contrast.
-- `pnpm e2e` — 36 Playwright tests pass: setup → reveals → nomination → vote →
-  legislative → reload/resume, duplicate names, newer-save refusal, the
+- `pnpm test` — 148 unit tests pass: role table over 10,000 runs per player
+  count (and over 1,000 at 4), deck/reshuffle, tracker, term limits, veto,
+  powers, all victories, the 4-player short tracks and board, expansion rules
+  (Communist track, Radicalisation, Confession, Five-Year Plan, joint victory),
+  public-view privacy, save v1→v2 migration and phase data validation, settings
+  migration, i18n key parity, and WCAG AA theme contrast.
+- `pnpm e2e` — 37 Playwright tests pass: setup → reveals → nomination → vote →
+  legislative → reload/resume, the 4-player house variant, duplicate names,
+  newer-save refusal, the
   face-down/flip role card (pre-flip absence, keyboard, reduced motion, FA/RTL),
   role-hide and vote-cancel safety, the routine-confirmation toggle, Persian
   RTL/theme persistence, how-to-play, a full five-player UI game to a liberal
@@ -247,9 +254,11 @@ are covered by evidence.
   emulators or 32-bit devices, and it is not Play-Store distributable.
 - Android runtime behavior is unverified: the APK was built and statically
   checked but never launched on a device.
-- The 11–13 player expansion is fan-made and has had less table testing than
-  the base game. The 13-player board needs vertical scrolling in a 640×360
-  landscape viewport (no horizontal overflow).
+- The 11–13 player expansion and the 4-player house variant are fan-made and
+  have had less table testing than the base game. The 4-player mode is a quick
+  house experiment: the 17-tile deck still favours the fascists, so expect
+  short, lopsided games. The 13-player board needs vertical scrolling in a
+  640×360 landscape viewport (no horizontal overflow).
 - Desktop windows are supported for development; only Android is the intended
   shipping target.
 

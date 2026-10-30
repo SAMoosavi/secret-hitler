@@ -80,18 +80,20 @@ export default {
     stepComponents: 'Components',
     stepReview: 'Review',
     playersTitle: 'How many players?',
-    playersHint: 'Secret Hitler needs 5 to 10 players; 11–13 adds the Communist expansion.',
-    playersMin: 'Choose at least 5 players. The official role table starts at 5.',
+    playersHint: 'Secret Hitler needs 5 to 10 players; 4 is a fan-made house variant, and 11–13 adds the Communist expansion.',
+    playersMin:
+      'The official role table starts at 5. The 4-player house variant is 2 liberals, 1 fascist and Hitler on shorter tracks.',
     namesTitle: 'Player names',
     namesHint: 'Names are public. Roles stay secret.',
     namePlaceholder: 'Player {n}',
     duplicate: '“{name}” is used twice. Choose a unique name.',
     rolesTitle: 'Role distribution',
     rolesHint: 'Calculated from the official table for {count} players.',
+    rolesHintSmall: 'House variant roles for {count} players.',
     liberals: 'Liberals',
     fascists: 'Fascists',
     hitler: 'Hitler',
-    knowledgeFive: 'At 5–6 players the lone fascist and Hitler recognise each other.',
+    knowledgeFive: 'At 4–6 players the lone fascist and Hitler recognise each other.',
     knowledgeMany:
       'Fascists recognise each other and Hitler. Hitler does not know the fascists.',
     componentsTitle: 'Prepare the table',
@@ -119,6 +121,13 @@ export default {
     backConfirm: 'Leave setup',
     expansionChip: 'Fan expansion',
     countExpansionA11y: '{count} players, Communist expansion',
+    smallTableChip: 'House variant',
+    countSmallA11y: '{count} players, house variant',
+    smallRolesHint:
+      'House variant: two liberals against one fascist and Hitler. There is no investigation power at 4 players.',
+    smallBoardNote:
+      'The 4-player board has 4 liberal spaces and 5 fascist spaces: policy peek on space 3, execution on space 4, fascist victory on space 5. Veto never unlocks.',
+    variantSmall: '4 players (house variant)',
     expansionRolesHint:
       'Communists know each other at 11+; Hitler does not know them.',
     communistRole: 'Communists',
@@ -371,10 +380,10 @@ export default {
   gameOver: {
     liberalWin: 'The liberals win',
     fascistWin: 'The fascists win',
-    liberalPolicies: '5 liberal policies were enacted.',
-    fascistPolicies: '6 fascist policies were enacted.',
+    liberalPolicies: '{count} liberal policies were enacted.',
+    fascistPolicies: '{count} fascist policies were enacted.',
     communistPolicies: '6 Communist policies were enacted.',
-    summary: 'Round {round} · {liberal}/5 liberal · {fascist}/6 fascist',
+    summary: 'Round {round} · {liberal}/{liberalMax} liberal · {fascist}/{fascistMax} fascist',
     hitlerExecuted: 'Hitler was executed.',
     hitlerElected: 'Hitler was elected chancellor.',
     newGame: 'Start new game',
@@ -397,10 +406,10 @@ export default {
       'Liberals win by enacting five liberal policies or by executing Hitler. Fascists win by enacting six fascist policies or by electing Hitler chancellor after the third fascist policy.',
     rolesTitle: 'Roles and teams',
     roles:
-      'Most players are liberals and do not know anyone else. Fascists know each other and Hitler, except that Hitler does not know the fascists in games of seven or more. In 5–6 player games the lone fascist and Hitler recognise each other.',
+      'Most players are liberals and do not know anyone else. Fascists know each other and Hitler, except that Hitler does not know the fascists in games of seven or more. In 4–6 player games the lone fascist and Hitler recognise each other.',
     distributionTitle: 'Distribution',
     distribution:
-      'The app calculates the exact roles from the official table. 5 players: 3 liberals, 1 fascist, 1 Hitler. 6: 4/1/1. 7: 4/2/1. 8: 5/2/1. 9: 5/3/1. 10: 6/3/1.',
+      'The app calculates the exact roles from the official table. 5 players: 3 liberals, 1 fascist, 1 Hitler. 6: 4/1/1. 7: 4/2/1. 8: 5/2/1. 9: 5/3/1. 10: 6/3/1. The 4-player house variant is 2/1/1.',
     setupTitle: 'Setup',
     setup:
       'Prepare 6 liberal and 11 fascist policy tiles, the board for the player count, and the secret role envelopes. Shuffle the policy deck and place it face down. The app can track the deck for you.',
@@ -427,10 +436,13 @@ export default {
       'Liberals win at five liberal policies or when Hitler is executed. Fascists win at six fascist policies or when Hitler is elected chancellor after at least three fascist policies. The app ends the game automatically.',
     hitlerTitle: 'Hitler and eligibility',
     hitler:
-      'Hitler is a fascist and knows the team at 5–6 players. From seven players Hitler does not know the fascists. Electing Hitler chancellor after the third fascist policy ends the game. Investigating Hitler shows fascist party membership, not the role.',
+      'Hitler is a fascist and knows the team at 4–6 players. From seven players Hitler does not know the fascists. Electing Hitler chancellor after the third fascist policy ends the game. Investigating Hitler shows fascist party membership, not the role.',
     vetoTitle: 'Veto',
     veto:
       'After the fifth fascist policy, the chancellor may ask the president to veto. If the president agrees, both policies are discarded and the election tracker advances. The president may refuse, and then the chancellor must enact a policy. Veto is not available in the session that enacted the fifth fascist policy.',
+    smallTitle: '4-player house variant',
+    small:
+      'At 4 players the app runs a fan-made house variant: 2 liberals against 1 fascist and Hitler, on shorter tracks. Liberals win at 4 liberal policies; fascists win at 5 fascist policies. The fascist board has four spaces — blank, blank, policy peek, execution — so there is no investigation at this count and veto never unlocks. Electing Hitler chancellor after the third fascist policy still ends the game. Balance is untested; treat it as a quick game rather than a tournament mode.',
     expansionTitle: 'Communist expansion (11–13 players)',
     expansion:
       'At 11–13 players a third party joins: the Communists. This is a fan-made expansion chosen by player count alone; there is no separate mode switch. Below 11 players it is off and the base 5–10 game is unchanged.',

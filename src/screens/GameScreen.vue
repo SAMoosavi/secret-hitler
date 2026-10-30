@@ -50,7 +50,11 @@ const announcement = computed(() => {
   if (view.value.lastElection) {
     parts.push(t(view.value.lastElection.approved ? 'game.approved' : 'game.rejected'))
   }
-  if (view.value.gameOver) parts.push(t(`gameOver.${view.value.gameOver.reason}`))
+  if (view.value.gameOver) {
+    const reason = view.value.gameOver.reason
+    const count = reason === 'liberalPolicies' ? view.value.enactedLiberal : view.value.enactedFascist
+    parts.push(t(`gameOver.${reason}`, { count: num(count) }))
+  }
   return parts.join('. ')
 })
 const selected = computed(() =>

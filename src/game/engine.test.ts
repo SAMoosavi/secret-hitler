@@ -57,6 +57,7 @@ function totalTiles(state: GameState): number {
 describe('role table and setup', () => {
   it('encodes the official 5-10 and expansion 11-13 distributions', () => {
     expect(ROLE_TABLE).toEqual({
+      4: { liberal: 2, fascist: 1, hitler: 1 },
       5: { liberal: 3, fascist: 1, hitler: 1 },
       6: { liberal: 4, fascist: 1, hitler: 1 },
       7: { liberal: 4, fascist: 2, hitler: 1 },
@@ -67,13 +68,13 @@ describe('role table and setup', () => {
       12: { liberal: 6, fascist: 3, communist: 2, hitler: 1 },
       13: { liberal: 6, fascist: 3, communist: 3, hitler: 1 },
     })
-    for (const count of [4, 14, 5.5]) {
+    for (const count of [3, 14, 5.5]) {
       expect(rolesFor(count as number)).toBeNull()
     }
   })
 
   it('rejects invalid player counts and duplicate names', () => {
-    expect(validateSetup({ playerCount: 4, names: names(4) })?.code).toBe('invalidPlayerCount')
+    expect(validateSetup({ playerCount: 3, names: names(3) })?.code).toBe('invalidPlayerCount')
     expect(validateSetup({ playerCount: 14, names: names(14) })?.code).toBe('invalidPlayerCount')
     expect(
       validateSetup({ playerCount: 5, names: ['Sam', 'sam', 'A', 'B', 'C'] })?.code,
@@ -94,7 +95,7 @@ describe('role table and setup', () => {
   })
 
   it('assigns exactly one valid role per player across 10,000 runs per count', () => {
-    for (let count = 5; count <= 10; count++) {
+    for (let count = 4; count <= 10; count++) {
       const expected = ROLE_TABLE[count]
       for (let run = 0; run < 10_000; run++) {
         const result = createGame({ playerCount: count, names: names(count) }, seededRng(run + count * 100_000))
@@ -143,7 +144,7 @@ describe('nomination and term limits', () => {
     if (!dead.ok) expect(dead.error.code).toBe('playerEliminated')
   })
 
-  it('allows the last president but not the last chancellor when exactly 5 live', () => {
+  it('allows the last president but not the last chancellor when five live', () => {
     const state = revealed()
     const president = state.presidentId
     const others = state.players.filter((p) => p.id !== president)
@@ -160,11 +161,22 @@ describe('nomination and term limits', () => {
       reason: 'termChancellor',
     })
 
+    // Four survivors keep the strict limit: three non-presidents cannot all be
+    // term-limited, so a nominee always exists.
     const four = structuredClone(five)
     four.players[others[2].id].alive = false
     expect(eligibility(four, lastPresident)).toMatchObject({
       eligible: false,
       reason: 'termPresident',
+    })
+
+    // Three survivors would have no nominee at all, so the exception applies.
+    const three = structuredClone(four)
+    three.players[others[3].id].alive = false
+    expect(eligibility(three, lastPresident)).toMatchObject({ eligible: true, reason: 'ok' })
+    expect(eligibility(three, lastChancellor)).toMatchObject({
+      eligible: false,
+      reason: 'termChancellor',
     })
   })
 })

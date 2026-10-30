@@ -1,13 +1,13 @@
 import {
   HAND_SIZE,
-  LIBERAL_TRACK,
-  FASCIST_TRACK,
   COMMUNIST_TRACK,
   MAX_PLAYERS,
   MIN_PLAYERS,
   TRACKER_MAX,
   communistPowerFor,
+  fascistTrackFor,
   isExpansion,
+  liberalTrackFor,
   partyForRole,
   powerFor,
   roleCounts,
@@ -137,7 +137,9 @@ export function eligibility(state: GameState, playerId: number): Eligibility {
   if (!player.alive) return { playerId, eligible: false, reason: 'dead' }
   if (player.id === state.presidentId) return { playerId, eligible: false, reason: 'president' }
   const living = livingPlayers(state).length
-  const fiveRemain = living === 5
+  // Exactly 5 live is the official exception; 3 survivors (5-6 player games
+  // after two executions) would otherwise have no nominee at all.
+  const fiveRemain = living === 5 || living <= 3
   if (state.lastChancellorId === playerId) {
     return { playerId, eligible: false, reason: 'termChancellor' }
   }
@@ -207,11 +209,11 @@ function checkPolicyVictory(state: GameState): boolean {
     setGameOver(state, { winners: ['communist'], reason: 'communistPolicies' })
     return true
   }
-  if (state.enactedLiberal >= LIBERAL_TRACK) {
+  if (state.enactedLiberal >= liberalTrackFor(state.playerCount)) {
     setGameOver(state, { winners: ['liberal'], reason: 'liberalPolicies' })
     return true
   }
-  if (state.enactedFascist >= FASCIST_TRACK) {
+  if (state.enactedFascist >= fascistTrackFor(state.playerCount)) {
     setGameOver(state, { winners: ['fascist'], reason: 'fascistPolicies' })
     return true
   }
