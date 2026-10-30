@@ -1,0 +1,77 @@
+{
+  "schemaVersion": 1,
+  "id": "v1-fixture-save",
+  "createdAt": 1700000000000,
+  "playerCount": 5,
+  "players": [
+    {
+      "id": 0,
+      "name": "Alice",
+      "role": "liberal",
+      "alive": true
+    },
+    {
+      "id": 1,
+      "name": "Bob",
+      "role": "fascist",
+      "alive": true
+    },
+    {
+      "id": 2,
+      "name": "Carol",
+      "role": "liberal",
+      "alive": true
+    },
+    {
+      "id": 3,
+      "name": "Dave",
+      "role": "hitler",
+      "alive": true
+    },
+    {
+      "id": 4,
+      "name": "Eve",
+      "role": "liberal",
+      "alive": true
+    }
+  ],
+  "phase": "nomination",
+  "presidentId": 0,
+  "nomineeId": null,
+  "lastElection": null,
+  "lastPresidentId": null,
+  "lastChancellorId": null,
+  "enactedLiberal": 0,
+  "enactedFascist": 0,
+  "deck": [
+    "liberal",
+    "fascist",
+    "liberal",
+    "fascist",
+    "liberal",
+    "fascist",
+    "liberal",
+    "fascist",
+    "liberal",
+    "fascist",
+    "liberal",
+    "fascist",
+    "fascist",
+    "fascist",
+    "fascist",
+    "fascist",
+    "fascist"
+  ],
+  "discard": [],
+  "tracker": 0,
+  "round": 1,
+  "revealIndex": 0,
+  "legislative": null,
+  "pendingAction": null,
+  "peeked": null,
+  "investigation": null,
+  "investigated": [],
+  "vetoUnlocked": false,
+  "specialReturnId": null,
+  "gameOver": null
+}

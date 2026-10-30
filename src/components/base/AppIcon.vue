@@ -38,6 +38,7 @@ const paths: Record<IconName, string[]> = {
   book: ['M4 4h6a3 3 0 0 1 3 3v13a3 3 0 0 0-3-3H4V4Z', 'M20 4h-6a3 3 0 0 0-3 3v13a3 3 0 0 1 3-3h6V4Z'],
   play: ['M8 5v14l11-7L8 5Z'],
   scale: ['M12 3v18M7 21h10M4 7h16', 'M7 7 4 13h6L7 7ZM17 7l-3 6h6l-3-6Z'],
+  star: ['M12 2.8l2.1 6.4h6.7l-5.4 3.9 2.1 6.4L12 15.6l-5.5 3.9 2.1-6.4-5.4-3.9h6.7l2.1-6.4Z'],
 }
 </script>
 

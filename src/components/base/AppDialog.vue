@@ -13,6 +13,7 @@ const props = withDefaults(
 )
 const emit = defineEmits<{ close: [] }>()
 const dialog = ref<HTMLDialogElement | null>(null)
+let unmounting = false
 
 function sync(open: boolean): void {
   const el = dialog.value
@@ -49,6 +50,8 @@ function onBackdrop(event: MouseEvent): void {
 
 function onNativeClose(): void {
   document.body.style.overflow = ''
+  // close() during teardown must not push a parent state update after unmount.
+  if (unmounting) return
   emit('close')
 }
 
@@ -57,6 +60,9 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
+  unmounting = true
+  // Closing restores focus to the invoking control; unmounting alone does not.
+  if (dialog.value?.open) dialog.value.close()
   document.body.style.overflow = ''
 })
 </script>

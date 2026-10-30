@@ -20,6 +20,12 @@ const sections = [
   ['vetoTitle', 'veto'],
   ['victoryTitle', 'victory'],
   ['hitlerTitle', 'hitler'],
+  ['expansionTitle', 'expansion'],
+  ['expansionRolesTitle', 'expansionRoles'],
+  ['expansionDeckTitle', 'expansionDeck'],
+  ['expansionTrackTitle', 'expansionTrack'],
+  ['expansionSecretTitle', 'expansionSecret'],
+  ['expansionVictoryTitle', 'expansionVictory'],
 ] as const
 
 const glossary = [
@@ -70,5 +76,6 @@ function back(): void {
     </p>
     <p class="mt-3 text-xs leading-relaxed text-muted">{{ t('about.attribution') }}</p>
     <p class="mt-1 text-xs leading-relaxed text-muted">{{ t('about.license') }}</p>
+    <p class="mt-1 text-xs leading-relaxed text-muted">{{ t('about.expansionAttribution') }}</p>
   </div>
 </template>

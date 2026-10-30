@@ -27,3 +27,4 @@ export type IconName =
   | 'book'
   | 'play'
   | 'scale'
+  | 'star'

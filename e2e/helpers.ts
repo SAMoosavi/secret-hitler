@@ -2,11 +2,33 @@ import { expect, type Page } from '@playwright/test'
 
 export const NAMES = ['Alice', 'Bob', 'Cara', 'Dan', 'Eve', 'Finn', 'Gus']
 
+/** Thirteen distinct names for the 11–13 player expansion. */
+export const WIDE_NAMES = [
+  'Alice',
+  'Bob',
+  'Cara',
+  'Dan',
+  'Eve',
+  'Finn',
+  'Gus',
+  'Hana',
+  'Ivan',
+  'Jo',
+  'Kai',
+  'Lena',
+  'Milo',
+]
+
 /** Walks the five setup steps and confirms the role shuffle. */
 export async function createGame(page: Page, names = NAMES): Promise<void> {
   await page.goto('/')
   await page.getByRole('button', { name: 'Start game' }).click()
-  await page.getByRole('button', { name: `${names.length} players` }).click()
+  // 11–13 carry the expansion in the accessible name, not just the visible count.
+  const countLabel =
+    names.length >= 11
+      ? `${names.length} players, Communist expansion`
+      : `${names.length} players`
+  await page.getByRole('button', { name: countLabel }).click()
   await page.getByRole('button', { name: 'Next', exact: true }).click()
 
   for (const [index, name] of names.entries()) {

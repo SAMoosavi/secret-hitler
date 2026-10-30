@@ -17,12 +17,17 @@ const props = withDefaults(
 const emit = defineEmits<{ select: [] }>()
 const { t } = useI18n()
 
-const isLiberal = computed(() => props.policy === 'liberal')
 const face = computed(() => (props.faceUp && props.policy ? props.policy : 'back'))
-const label = computed(() => {
-  if (!props.faceUp || !props.policy) return t('legislative.cardsHidden')
-  return isLiberal.value ? t('legislative.policyLiberal') : t('legislative.policyFascist')
-})
+const ICONS = { liberal: 'sun', fascist: 'crest', communist: 'star' } as const
+const LABELS = {
+  liberal: 'legislative.policyLiberal',
+  fascist: 'legislative.policyFascist',
+  communist: 'legislative.policyCommunist',
+} as const
+const label = computed(() =>
+  face.value === 'back' ? t('legislative.cardsHidden') : t(LABELS[face.value]),
+)
+const faceIcon = computed(() => (face.value === 'back' ? 'lock' : ICONS[face.value]))
 const width = computed(
   () => ({ sm: '3.5rem', md: '5rem', lg: '6rem' })[props.size],
 )
@@ -40,13 +45,13 @@ const width = computed(
     @click="clickable && !disabled ? emit('select') : undefined"
   >
     <template v-if="face === 'back'">
-      <AppIcon name="lock" :size="size === 'sm' ? 18 : 24" />
+      <AppIcon :name="faceIcon" :size="size === 'sm' ? 18 : 24" />
       <span class="text-[0.6rem] font-bold uppercase tracking-widest opacity-80">
         {{ t('legislative.cardsHidden') }}
       </span>
     </template>
     <template v-else>
-      <AppIcon :name="isLiberal ? 'sun' : 'crest'" :size="size === 'sm' ? 22 : 30" />
+      <AppIcon :name="faceIcon" :size="size === 'sm' ? 22 : 30" />
       <span class="px-1 text-center text-[0.62rem] font-extrabold uppercase leading-tight tracking-wide">
         {{ label }}
       </span>

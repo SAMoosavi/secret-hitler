@@ -104,6 +104,7 @@
   --color-gold: var(--gold);
   --color-liberal: var(--blue);
   --color-fascist: var(--red);
+  --color-communist: var(--green);
   --color-danger: var(--danger-text);
   --font-display: Georgia, 'Times New Roman', 'Vazirmatn', serif;
   --font-body:
@@ -225,6 +226,7 @@ textarea {
   box-shadow: var(--shadow);
 }
 .board-surface {
+  min-width: 0;
   border: 1px solid color-mix(in srgb, var(--gold) 35%, var(--line));
   border-radius: 1rem;
   background:
@@ -412,6 +414,12 @@ textarea {
     radial-gradient(circle at 50% 20%, rgb(255 255 255 / 0.14), transparent 55%),
     linear-gradient(165deg, var(--red), var(--red-2));
   color: #fbeeee;
+}
+.policy-card.communist {
+  background:
+    radial-gradient(circle at 50% 20%, rgb(255 255 255 / 0.16), transparent 55%),
+    linear-gradient(165deg, color-mix(in srgb, var(--green) 82%, #000), color-mix(in srgb, var(--green) 52%, #000));
+  color: #eefbf1;
 }
 .policy-card.back {
   background:
@@ -690,5 +698,8 @@ dialog.app-dialog[open] .dialog-card {
 @media (orientation: landscape) and (min-width: 560px) {
   .board-tracks {
     grid-template-columns: 1fr 1fr;
+  }
+  .board-tracks.board-tracks-expansion {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }

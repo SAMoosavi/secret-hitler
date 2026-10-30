@@ -45,7 +45,9 @@ watch(
 )
 
 function policyLabel(policy: Policy): string {
-  return policy === 'liberal' ? t('legislative.policyLiberal') : t('legislative.policyFascist')
+  if (policy === 'liberal') return t('legislative.policyLiberal')
+  if (policy === 'communist') return t('legislative.policyCommunist')
+  return t('legislative.policyFascist')
 }
 
 async function reveal(): Promise<void> {

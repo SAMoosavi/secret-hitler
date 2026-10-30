@@ -55,7 +55,7 @@ function totalTiles(state: GameState): number {
 }
 
 describe('role table and setup', () => {
-  it('encodes the official 5-10 player distributions', () => {
+  it('encodes the official 5-10 and expansion 11-13 distributions', () => {
     expect(ROLE_TABLE).toEqual({
       5: { liberal: 3, fascist: 1, hitler: 1 },
       6: { liberal: 4, fascist: 1, hitler: 1 },
@@ -63,15 +63,18 @@ describe('role table and setup', () => {
       8: { liberal: 5, fascist: 2, hitler: 1 },
       9: { liberal: 5, fascist: 3, hitler: 1 },
       10: { liberal: 6, fascist: 3, hitler: 1 },
+      11: { liberal: 5, fascist: 3, communist: 2, hitler: 1 },
+      12: { liberal: 6, fascist: 3, communist: 2, hitler: 1 },
+      13: { liberal: 6, fascist: 3, communist: 3, hitler: 1 },
     })
-    for (const count of [4, 11, 5.5]) {
+    for (const count of [4, 14, 5.5]) {
       expect(rolesFor(count as number)).toBeNull()
     }
   })
 
   it('rejects invalid player counts and duplicate names', () => {
     expect(validateSetup({ playerCount: 4, names: names(4) })?.code).toBe('invalidPlayerCount')
-    expect(validateSetup({ playerCount: 11, names: names(11) })?.code).toBe('invalidPlayerCount')
+    expect(validateSetup({ playerCount: 14, names: names(14) })?.code).toBe('invalidPlayerCount')
     expect(
       validateSetup({ playerCount: 5, names: ['Sam', 'sam', 'A', 'B', 'C'] })?.code,
     ).toBe('duplicateNames')
@@ -265,6 +268,40 @@ describe('policy powers', () => {
     expect(powerFor(7, 2)).toBe('investigate')
   })
 
+  it('dispatches base powers from fascist cards and none from liberal cards', () => {
+    const state = revealed(7)
+    const fascist = {
+      ...state,
+      enactedFascist: 1,
+      phase: 'legislativeChancellor' as const,
+      legislative: {
+        presidentHand: [],
+        chancellorHand: ['fascist', 'liberal'] as Policy[],
+        presidentDiscard: 'liberal' as Policy,
+        vetoRequested: false,
+      },
+    }
+    const withPower = act(fascist, { type: 'chancellorEnact', index: 0 })
+    expect(withPower.pendingAction).toEqual({ type: 'investigate', actorId: state.presidentId })
+    expect(withPower.phase).toBe('executive')
+
+    const withoutPower = act(
+      {
+        ...fascist,
+        enactedFascist: 0,
+        legislative: {
+          ...fascist.legislative,
+          chancellorHand: ['liberal', 'fascist'] as Policy[],
+        },
+      },
+      { type: 'chancellorEnact', index: 0 },
+    )
+    expect(withoutPower.pendingAction).toBeNull()
+    expect(withoutPower.phase).toBe('nomination')
+    expect(withoutPower.enactedLiberal).toBe(1)
+    expect(withoutPower.enactedCommunist).toBe(0)
+  })
+
   it('investigates party membership once, never the role', () => {
     let state = revealed()
     const president = state.presidentId
@@ -324,7 +361,7 @@ describe('policy powers', () => {
     expect(killed.phase).toBe('nomination')
 
     const ended = act(state, { type: 'execute', playerId: hitler })
-    expect(ended.gameOver).toEqual({ winner: 'liberal', reason: 'hitlerExecuted' })
+    expect(ended.gameOver).toEqual({ winners: ['liberal'], reason: 'hitlerExecuted' })
     expect(ended.phase).toBe('gameOver')
   })
 
@@ -424,7 +461,7 @@ describe('victory conditions', () => {
       type: 'chancellorEnact',
       index: 0,
     })
-    expect(state.gameOver).toEqual({ winner: 'liberal', reason: 'liberalPolicies' })
+    expect(state.gameOver).toEqual({ winners: ['liberal'], reason: 'liberalPolicies' })
   })
 
   it('ends on six fascist policies without resolving the power', () => {
@@ -432,7 +469,7 @@ describe('victory conditions', () => {
       type: 'chancellorEnact',
       index: 0,
     })
-    expect(state.gameOver).toEqual({ winner: 'fascist', reason: 'fascistPolicies' })
+    expect(state.gameOver).toEqual({ winners: ['fascist'], reason: 'fascistPolicies' })
     expect(state.pendingAction).toBeNull()
   })
 
@@ -446,7 +483,7 @@ describe('victory conditions', () => {
       nomineeId: hitler,
     }
     state = act(state, { type: 'vote', approved: true })
-    expect(state.gameOver).toEqual({ winner: 'fascist', reason: 'hitlerElected' })
+    expect(state.gameOver).toEqual({ winners: ['fascist'], reason: 'hitlerElected' })
     expect(state.phase).toBe('gameOver')
   })
 
@@ -484,8 +521,10 @@ describe('knowledge', () => {
     }
     expect(knowledgeFor(state, hitler.id)).toEqual({
       role: 'hitler',
+      party: 'fascist',
       fascists: [],
       hitler: null,
+      communists: [],
     })
   })
 
@@ -494,8 +533,10 @@ describe('knowledge', () => {
     const liberal = state.players.find((p) => p.role === 'liberal')!
     expect(knowledgeFor(state, liberal.id)).toEqual({
       role: 'liberal',
+      party: 'liberal',
       fascists: [],
       hitler: null,
+      communists: [],
     })
   })
 })
@@ -520,7 +561,7 @@ describe('invalid transitions', () => {
     const state: GameState = {
       ...revealed(),
       phase: 'gameOver',
-      gameOver: { winner: 'liberal', reason: 'liberalPolicies' },
+      gameOver: { winners: ['liberal'], reason: 'liberalPolicies' },
     }
     const result = transition(state, { type: 'nominate', playerId: 1 })
     expect(result.ok).toBe(false)
@@ -580,7 +621,7 @@ describe('full game simulation', () => {
         throw new Error(`unexpected phase ${state.phase}`)
       }
     }
-    expect(state.gameOver).toEqual({ winner: 'fascist', reason: 'fascistPolicies' })
+    expect(state.gameOver).toEqual({ winners: ['fascist'], reason: 'fascistPolicies' })
     expect(state.enactedFascist).toBe(6)
   })
 })

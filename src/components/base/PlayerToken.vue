@@ -14,6 +14,8 @@ const props = withDefaults(
     reason?: EligibilityReason
     selectable?: boolean
     selected?: boolean
+    /** Radicalisation may target the sitting President. */
+    allowPresident?: boolean
   }>(),
   {
     president: false,
@@ -23,13 +25,18 @@ const props = withDefaults(
     reason: 'ok',
     selectable: false,
     selected: false,
+    allowPresident: false,
   },
 )
 const emit = defineEmits<{ select: [] }>()
 const { t, locale } = useI18n()
 
 const canSelect = computed(
-  () => props.selectable && props.player.alive && props.eligible && !props.president,
+  () =>
+    props.selectable &&
+    props.player.alive &&
+    props.eligible &&
+    (props.allowPresident || !props.president),
 )
 const reasonText = computed(() => {
   if (!props.player.alive) return t('nomination.reasonDead')

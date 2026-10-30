@@ -1,7 +1,15 @@
-export type Role = 'liberal' | 'fascist' | 'hitler'
-export type Party = 'liberal' | 'fascist'
-export type Policy = 'liberal' | 'fascist'
-export type Power = 'none' | 'investigate' | 'peek' | 'special' | 'execute'
+export type Role = 'liberal' | 'fascist' | 'hitler' | 'communist'
+export type Party = 'liberal' | 'fascist' | 'communist'
+export type Policy = 'liberal' | 'fascist' | 'communist'
+export type Power =
+  | 'none'
+  | 'investigate'
+  | 'peek'
+  | 'special'
+  | 'execute'
+  | 'radicalise'
+  | 'fiveYearPlan'
+  | 'confession'
 
 export type Phase =
   | 'roleReveal'
@@ -10,12 +18,15 @@ export type Phase =
   | 'legislativePresident'
   | 'legislativeChancellor'
   | 'executive'
+  | 'communistPower'
+  | 'radicalisationReveal'
   | 'gameOver'
 
-export type Winner = 'liberal' | 'fascist'
+export type Winner = 'liberal' | 'fascist' | 'communist'
 export type WinReason =
   | 'liberalPolicies'
   | 'fascistPolicies'
+  | 'communistPolicies'
   | 'hitlerExecuted'
   | 'hitlerElected'
 
@@ -23,6 +34,8 @@ export interface Player {
   id: number
   name: string
   role: Role
+  /** Current party; changes permanently on Radicalisation. */
+  party: Party
   alive: boolean
 }
 
@@ -55,13 +68,27 @@ export interface InvestigationResult {
   party: Party
 }
 
+export interface Confession {
+  playerId: number
+  party: Party
+  round: number
+}
+
+export interface Radicalisation {
+  targetId: number
+  before: Party
+  after: Party
+  revealIndex: number
+}
+
 export interface GameOver {
-  winner: Winner
+  winners: Winner[]
   reason: WinReason
 }
 
 export interface GameState {
-  schemaVersion: 1
+  schemaVersion: 2
+  expansion: 'communist' | null
   id: string
   createdAt: number
   playerCount: number
@@ -74,6 +101,7 @@ export interface GameState {
   lastChancellorId: number | null
   enactedLiberal: number
   enactedFascist: number
+  enactedCommunist: number
   deck: Policy[]
   discard: Policy[]
   tracker: number
@@ -86,11 +114,15 @@ export interface GameState {
   investigated: number[]
   vetoUnlocked: boolean
   specialReturnId: number | null
+  confessions: Confession[]
+  radicalisation: Radicalisation | null
+  confession: { playerId: number; party: Party } | null
   gameOver: GameOver | null
 }
 
 export interface PublicView {
-  schemaVersion: 1
+  schemaVersion: 2
+  expansion: 'communist' | null
   id: string
   playerCount: number
   players: PublicPlayer[]
@@ -102,6 +134,8 @@ export interface PublicView {
   lastChancellorId: number | null
   enactedLiberal: number
   enactedFascist: number
+  /** Only present for the 11-13 Communist expansion. */
+  enactedCommunist?: number
   deckCount: number
   discardCount: number
   tracker: number
@@ -109,6 +143,8 @@ export interface PublicView {
   vetoUnlocked: boolean
   investigated: number[]
   pendingActionType: PendingAction['type'] | null
+  /** Public Confession history; only present for the 11-13 expansion. */
+  confessions?: Confession[]
   gameOver: GameOver | null
 }
 
@@ -153,6 +189,11 @@ export type GameAction =
   | { type: 'acknowledgePeek' }
   | { type: 'specialElection'; playerId: number }
   | { type: 'execute'; playerId: number }
+  | { type: 'radicalise'; playerId: number }
+  | { type: 'nextRadicalisationReveal' }
+  | { type: 'finishRadicalisation' }
+  | { type: 'acknowledgeConfession' }
+  | { type: 'acknowledgeFiveYearPlan' }
 
 export type ActionResult =
   | { ok: true; state: GameState }
@@ -173,7 +214,9 @@ export interface Eligibility {
 
 export interface KnowledgeEntry {
   role: Role
+  party: Party
   /** Player names this player may privately recognise, by relationship. */
   fascists: string[]
   hitler: string | null
+  communists: string[]
 }

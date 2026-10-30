@@ -8,7 +8,8 @@ import PlayerToken from '../base/PlayerToken.vue'
 import { confirmAction } from '../../stores/confirm'
 import { feedback } from '../../platform/feedback'
 import { useSettingsStore } from '../../stores/settings'
-import type { GameState, Player } from '../../game/types'
+import { formatNumber } from '../../i18n/format'
+import type { GameState, Party, Player, Policy } from '../../game/types'
 
 const props = defineProps<{ state: GameState; busy?: boolean }>()
 const emit = defineEmits<{
@@ -17,9 +18,11 @@ const emit = defineEmits<{
   acknowledgePeek: []
   specialElection: [id: number]
   execute: [id: number]
+  acknowledgeFiveYearPlan: []
 }>()
-const { t } = useI18n()
+const { t, locale } = useI18n()
 const settings = useSettingsStore()
+const num = (value: number): string => formatNumber(value, locale.value)
 
 const peekRevealed = ref(false)
 const power = computed(() => props.state.pendingAction?.type ?? null)
@@ -48,13 +51,28 @@ const title = computed(() => {
       return t('executive.specialTitle')
     case 'execute':
       return t('executive.executeTitle')
+    case 'fiveYearPlan':
+      return t('fyp.title')
     default:
       return t('executive.investigateTitle')
   }
 })
 
-function policyLabel(policy: 'liberal' | 'fascist'): string {
-  return policy === 'liberal' ? t('legislative.policyLiberal') : t('legislative.policyFascist')
+// A converted player must read Communist, not their original party.
+function partyView(party: Party): { icon: 'sun' | 'crest' | 'star'; tone: string; label: string } {
+  if (party === 'liberal') {
+    return { icon: 'sun', tone: 'text-liberal', label: t('executive.partyLiberal') }
+  }
+  if (party === 'communist') {
+    return { icon: 'star', tone: 'text-communist', label: t('executive.partyCommunist') }
+  }
+  return { icon: 'crest', tone: 'text-fascist', label: t('executive.partyFascist') }
+}
+
+function policyLabel(policy: Policy): string {
+  if (policy === 'liberal') return t('legislative.policyLiberal')
+  if (policy === 'communist') return t('legislative.policyCommunist')
+  return t('legislative.policyFascist')
 }
 
 async function choose(player: Player): Promise<void> {
@@ -119,9 +137,24 @@ async function acknowledgeInvestigation(): Promise<void> {
 
 <template>
   <AppDialog :open="true" :closeable="false" :title="title">
-    <p class="text-sm text-muted">{{ t('reveal.passTo', { name: president }) }}</p>
+    <p v-if="power !== 'fiveYearPlan'" class="text-sm text-muted">
+      {{ t('reveal.passTo', { name: president }) }}
+    </p>
 
-    <template v-if="power === 'peek'">
+    <template v-if="power === 'fiveYearPlan'">
+      <p class="mt-2 text-sm text-muted" role="status">{{ t('fyp.body') }}</p>
+      <p class="mt-2 text-sm font-bold">{{ t('fyp.deck', { count: num(state.deck.length) }) }}</p>
+      <button
+        type="button"
+        class="btn btn-primary mt-4 w-full"
+        :disabled="busy"
+        @click="emit('acknowledgeFiveYearPlan')"
+      >
+        {{ t('common.continue') }}
+      </button>
+    </template>
+
+    <template v-else-if="power === 'peek'">
       <div v-if="!peekRevealed" class="mt-4 flex flex-col items-center gap-3 rounded-xl border border-dashed border-line bg-surface-2/50 p-4">
         <div class="flex gap-2">
           <PolicyCard v-for="n in 3" :key="n" size="md" />
@@ -152,13 +185,12 @@ async function acknowledgeInvestigation(): Promise<void> {
         <p class="mt-1 text-lg font-bold">
           {{ state.players.find((p) => p.id === state.investigation!.playerId)?.name }}
         </p>
-        <p class="mt-2 flex items-center justify-center gap-2 text-sm font-bold">
-          <AppIcon
-            :name="state.investigation.party === 'liberal' ? 'sun' : 'crest'"
-            :size="20"
-            :class="state.investigation.party === 'liberal' ? 'text-liberal' : 'text-fascist'"
-          />
-          {{ state.investigation.party === 'liberal' ? t('executive.partyLiberal') : t('executive.partyFascist') }}
+        <p
+          class="mt-2 flex items-center justify-center gap-2 text-sm font-bold"
+          :class="partyView(state.investigation.party).tone"
+        >
+          <AppIcon :name="partyView(state.investigation.party).icon" :size="20" />
+          {{ partyView(state.investigation.party).label }}
         </p>
         <p class="mt-2 text-xs text-muted">{{ t('executive.investigateConfirmBody') }}</p>
       </div>
