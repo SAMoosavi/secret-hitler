@@ -35,30 +35,33 @@ test setup usable offline. The suite runs `pnpm build` + `vite preview` itself.
 
 ### Android APK
 
-A debug-signed, installable APK is built locally into `apk/` (gitignored — rebuild
+An installable release APK is built locally into `apk/` (gitignored — rebuild
 with the command below):
 
 ```
-apk/secret-hitler-companion-0.1.0-arm64-debug.apk   20 MB
-sha256 effbec6a206c38deea89f1de5a598b5b293874475018362e34583e4d5c289c92
+apk/secret-hitler-companion-0.1.1-arm64-release.apk   8.2 MB
+sha256 f0c7cdf6db195470c9a2ab10284b379dc019db0b1b2ab6055d8b2ef3d88a3eb4
 ```
 
 Install over USB or by opening the file on the device (allow unknown sources):
 
 ```bash
-adb install -r apk/secret-hitler-companion-0.1.0-arm64-debug.apk
+adb install -r apk/secret-hitler-companion-0.1.1-arm64-release.apk
 ```
 
-What the artifact is: package `app.secrethitler.companion`, version `0.1.0`,
-`minSdk 24`, `targetSdk 37`, native code for **`arm64-v8a` only** (no x86_64
-emulator build), signed with the standard Android **debug** certificate. It is
-not a release build: it is debuggable and must not be distributed.
+What the artifact is: package `app.secrethitler.companion`, version `0.1.1`
+(versionCode 1001), `minSdk 24`, `targetSdk 37`, native code for **`arm64-v8a`
+only** (no x86_64 emulator build), R8-minified and **not debuggable** — a real
+release build. It is signed with the project's Android **debug** key (same
+certificate as the earlier debug builds) so it installs over them; it is still
+not Play-Store distributable.
 
 Verified on the built file (not merely configured):
 
-- `apksigner verify` — passes (v2 scheme, `CN=Android Debug`).
-- `aapt2 dump badging` — correct package/version/targetSdk, `native-code:
-  'arm64-v8a'`, and no `android.permission.INTERNET`.
+- `apksigner verify` — passes (v2 scheme, cert SHA-256 `da9d93d2…cfd2`).
+- `aapt2 dump badging` — package/version 0.1.1, `minSdkVersion 24`,
+  `targetSdkVersion 37`, `native-code: 'arm64-v8a'`, no `debuggable` flag, and
+  no `android.permission.INTERNET`.
 - The frontend bundle and Vazirmatn fonts are embedded in
   `lib/arm64-v8a/libsecret_hitler_companion_lib.so` (custom protocol, no asset
   server, no network).
@@ -67,15 +70,17 @@ Build command (requires JDK 21, Android SDK platform 36 **and** 37, NDK
 27.2.12479018, and the `aarch64-linux-android` Rust target):
 
 ```bash
-CI=1 pnpm tauri android build --debug --apk -t aarch64 --ci
+CI=1 pnpm tauri android build --apk -t aarch64 --ci
 ```
 
-Output: `src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk`
-(copied to `apk/`). For a release APK, run the same command without `--debug`
-and sign the unsigned output with your own keystore.
+Output:
+`src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk`
+(copied to `apk/`). The release build type reuses the debug signing config, set
+in `src-tauri/gen/android/app/build.gradle.kts`, so no keystore is needed
+locally.
 
 Run `./gradlew clean` in `src-tauri/gen/android/` before rebuilding: an
-incremental build can reuse stale dex and produce a 32 MB APK instead of 20 MB.
+incremental build can reuse stale dex and produce a much larger APK.
 
 **Blank-check caveat:** the APK was built and statically verified, but it has
 **not been launched on a physical device or emulator** — none was available
@@ -83,28 +88,30 @@ here. Runtime behavior on Android is unconfirmed.
 
 ### GitHub releases (CI)
 
-`.github/workflows/release.yml` builds the same arm64 debug APK and attaches it
-to a GitHub Release whenever a pull request is **merged into `main`** (or when
-run manually from the Actions tab). The release tag is
+`.github/workflows/release.yml` builds the same arm64 **release** APK and
+attaches it to a GitHub Release whenever a pull request is **merged into
+`main`** (or when run manually from the Actions tab). The release tag is
 `v<package version>-build.<run number>` and the assets are
-`secret-hitler-companion-<version>-arm64-debug.apk` plus its `.sha256`.
+`secret-hitler-companion-<version>-arm64-release.apk` plus its `.sha256`.
 
 Install from a release: open the release on the phone, download the APK, allow
-installing from that source, tap the file. It is the same debug-signed build as
-the local `apk/` artifact — arm64-v8a only, Android 7.0+ (`minSdk 24`), no
-Internet permission, not a store build.
+installing from that source, tap the file. It is the same release build as the
+local `apk/` artifact — arm64-v8a only, Android 7.0+ (`minSdk 24`), no Internet
+permission, not a store build.
 
 CI runs `pnpm install --frozen-lockfile`, `pnpm test`, then
-`pnpm tauri android build --debug --apk -t aarch64` with Node 24, JDK 21, Rust
+`pnpm tauri android build --apk -t aarch64` with Node 24, JDK 21, Rust
 stable + `aarch64-linux-android`, Android platform 37.0, build-tools 37.0.0 and NDK
 27.2.12479018. It does not run Playwright (no browser download in CI) and it
 cannot launch the APK.
 
-**Update signature:** the runner generates a fresh Android debug keystore per
-run, so without a stored key each release has a different signature and Android
-refuses to install it over the previous one. Store the local debug keystore once
-as a repository secret (it is not a secret in the security sense — the password
-is the well-known `android` — but it must be the same key every run):
+**Update signature:** the release build is signed with the project's Android
+debug key so it installs over the earlier debug-signed builds. The runner
+generates a fresh debug keystore per run, so without a stored key each release
+has a different signature and Android refuses to install it over the previous
+one. Store the local debug keystore once as a repository secret (it is not a
+secret in the security sense — the password is the well-known `android` — but it
+must be the same key every run):
 
 ```bash
 base64 -w0 ~/.android/debug.keystore | gh secret set ANDROID_DEBUG_KEYSTORE_BASE64
@@ -209,7 +216,7 @@ Verified in this environment on 2026-10-29:
   policy victory, and 360×640 dp portrait/landscape layouts without overflow.
 - `pnpm build` — typecheck and production build pass.
 - `pnpm check:rust` — the Tauri shell compiles on Linux.
-- Android debug APK — builds and is statically verified as described above.
+- Android release APK — builds and is statically verified as described above.
 
 Not run: launching the APK on an Android device or emulator, iOS builds, and a
 desktop GUI launch. Only the browser app, the Rust compile and the APK packaging
@@ -225,9 +232,9 @@ are covered by evidence.
   add hidden state. Start a new game if the table mis-records a result.
 - Single save slot. Starting a new game replaces the saved one after
   confirmation.
-- The shipped APK is **arm64-v8a debug-signed**. It runs on modern arm64 phones
-  and tablets; it will not install on x86 emulators or 32-bit devices, and it is
-  not Play-Store distributable.
+- The shipped APK is an **arm64-v8a release build signed with the debug key**.
+  It runs on modern arm64 phones and tablets; it will not install on x86
+  emulators or 32-bit devices, and it is not Play-Store distributable.
 - Android runtime behavior is unverified: the APK was built and statically
   checked but never launched on a device.
 - Desktop windows are supported for development; only Android is the intended

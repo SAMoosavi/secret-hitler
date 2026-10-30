@@ -34,6 +34,9 @@ android {
             isMinifyEnabled = false
         }
         getByName("release") {
+            // Sideload releases must install over the earlier debug builds: reuse
+            // the debug key, restored from CI on every run.
+            signingConfig = signingConfigs.getByName("debug")
             optimization {
                enable = true
             }

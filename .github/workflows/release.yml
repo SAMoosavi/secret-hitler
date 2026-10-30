@@ -88,13 +88,13 @@ jobs:
           export NDK_HOME="$ANDROID_HOME/ndk/27.2.12479018"
           export ANDROID_NDK_HOME="$NDK_HOME"
           export ANDROID_NDK_ROOT="$NDK_HOME"
-          pnpm tauri android build --debug --apk -t aarch64 --ci
+          pnpm tauri android build --apk -t aarch64 --ci
 
       - name: Stage the APK
         id: apk
         run: |
           version=$(node -p "require('./package.json').version")
-          src=src-tauri/gen/android/app/build/outputs/apk/universal/debug/app-universal-debug.apk
+          src=src-tauri/gen/android/app/build/outputs/apk/universal/release/app-universal-release.apk
           test -f "$src"
           if [ -n "$EXPECTED_CERT_SHA256" ]; then
             actual=$("$ANDROID_HOME/build-tools/37.0.0/apksigner" verify --print-certs "$src" \
@@ -104,7 +104,7 @@ jobs:
               exit 1
             fi
           fi
-          name="secret-hitler-companion-${version}-arm64-debug.apk"
+          name="secret-hitler-companion-${version}-arm64-release.apk"
           cp "$src" "$name"
           sha256sum "$name" | tee "$name.sha256"
           {
@@ -124,7 +124,7 @@ jobs:
           PR: ${{ github.event.pull_request.number }}
         run: |
           {
-            echo "Offline Secret Hitler companion for the physical board. **Debug-signed, arm64-v8a only, Android 7.0+ (minSdk 24).**"
+            echo "Offline Secret Hitler companion for the physical board. **Release build, arm64-v8a only, Android 7.0+ (minSdk 24).**"
             echo
             echo "**Install:** download \`$NAME\` on the phone, allow installing from this source, then open the file."
             echo
@@ -132,7 +132,7 @@ jobs:
             if [ -n "$PR" ]; then echo "- merged PR #$PR"; fi
             echo "- sha256 \`$SHA\`"
             echo
-            echo "Debug-signed, not a store build, no Internet permission. CI has not run this APK on a device."
+            echo "Release build signed with the project's debug key so it installs over earlier builds; not a store build, no Internet permission. CI has not run this APK on a device."
           } > notes.md
           gh release create "$TAG" "$NAME" "$NAME.sha256" \
             --target "$COMMIT" \
