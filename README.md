@@ -35,33 +35,31 @@ test setup usable offline. The suite runs `pnpm build` + `vite preview` itself.
 
 ### Android APK
 
-An installable release APK is built locally into `apk/` (gitignored — rebuild
-with the command below):
+An installable release APK is published on the
+[Releases page](https://github.com/SAMoosavi/secret-hitler/releases) by CI, and
+can be built locally into `apk/` (gitignored) with the command below.
 
-```
-apk/secret-hitler-companion-0.1.1-arm64-release.apk   8.2 MB
-sha256 f0c7cdf6db195470c9a2ab10284b379dc019db0b1b2ab6055d8b2ef3d88a3eb4
-```
-
-Install over USB or by opening the file on the device (allow unknown sources):
+Install by opening the release on the phone, downloading the APK, allowing
+installs from that source, and tapping the file. For a USB install:
 
 ```bash
-adb install -r apk/secret-hitler-companion-0.1.1-arm64-release.apk
+adb install -r secret-hitler-companion-0.2.0-arm64-release.apk
 ```
 
-What the artifact is: package `app.secrethitler.companion`, version `0.1.1`
-(versionCode 1001), `minSdk 24`, `targetSdk 37`, native code for **`arm64-v8a`
+What the artifact is: package `app.secrethitler.companion`, version `0.2.0`
+(versionCode 2000), `minSdk 24`, `targetSdk 37`, native code for **`arm64-v8a`
 only** (no x86_64 emulator build), R8-minified and **not debuggable** — a real
 release build. It is signed with the project's Android **debug** key (same
 certificate as the earlier debug builds) so it installs over them; it is still
 not Play-Store distributable.
 
-Verified on the built file (not merely configured):
+Static checks on the published file:
 
-- `apksigner verify` — passes (v2 scheme, cert SHA-256 `da9d93d2…cfd2`).
-- `aapt2 dump badging` — package/version 0.1.1, `minSdkVersion 24`,
-  `targetSdkVersion 37`, `native-code: 'arm64-v8a'`, no `debuggable` flag, and
-  no `android.permission.INTERNET`.
+- `apksigner verify --print-certs` — v2 scheme, cert SHA-256 `da9d93d2…cfd2`
+  (the workflow refuses to publish a different key).
+- `aapt2 dump badging` — package/version `0.2.0` (versionCode 2000),
+  `minSdkVersion 24`, `targetSdkVersion 37`, `native-code: 'arm64-v8a'`, no
+  `debuggable` flag, and no `android.permission.INTERNET`.
 - The frontend bundle and Vazirmatn fonts are embedded in
   `lib/arm64-v8a/libsecret_hitler_companion_lib.so` (custom protocol, no asset
   server, no network).
@@ -156,17 +154,21 @@ src/
 ```
 
 - **Rules engine** (`src/game/engine.ts`): a reducer, `transition(state, action,
-  rng)`, covering role tables for 5–10 players, term limits (including the
+  rng)`, covering role tables for 5–13 players, term limits (including the
   exactly-five-player exception), election tracker/chaos, veto after the fifth
   fascist policy, all four executive powers, special elections, and every
-  victory path. All randomness is injected (`Rng`), so tests are deterministic.
+  victory path. At 11–13 players it also runs the fan-made Communist expansion
+  (`src/game/expansion.ts`): a third party, a shared Communist policy track,
+  Radicalisation, Confession, Five-Year Plan, and the joint Hitler-execution
+  victory. All randomness is injected (`Rng`), so tests are deterministic.
 - **Privacy boundary:** `selectPublicView(state)` strips roles, deck order,
   hands, and private results. Screens receive the public view; only dialogs that
   have been explicitly opened receive the full state.
-- **Persistence:** one versioned save (`schemaVersion: 1`) written after every
+- **Persistence:** one versioned save (`schemaVersion: 2`) written after every
   successful transition. Web/e2e use `localStorage` (`sh.game`); the Tauri build
-  uses `@tauri-apps/plugin-store`. Unknown/newer schema versions are refused
-  without touching the save; malformed phase data loads as corrupt.
+  uses `@tauri-apps/plugin-store`. Version 1 saves migrate in place; unknown or
+  newer schema versions are refused without touching the save; malformed phase
+  data loads as corrupt.
 - **Confirm-first where it matters:** destructive or secret actions (exit,
   delete save, start new game, vote record, revealing a hand, veto, executive
   targets) always open a confirm dialog. Routine ones (nomination, policy
@@ -185,16 +187,21 @@ src/
 
 ## Features
 
-- Setup wizard for 5–10 players with duplicate-name blocking and a role/board
-  review.
+- Setup wizard for 5–13 players with duplicate-name blocking and a role/board
+  review. The Communist expansion switches on automatically at 11–13 players.
 - Secret role reveal with per-player knowledge (fascists know each other and
-  Hitler; at 5–6 players Hitler also knows the fascists).
+  Hitler; at 5–6 players Hitler also knows the fascists). At 11–13 players
+  Communists know each other and their secret step; fascists do not see them.
 - Election flow: nomination eligibility with disabled reasons, aggregate vote
   entry, tracker and chaos resolution.
 - Legislative session: hidden cards, explicit reveal confirmation, one tap to
   discard or enact, veto request/response.
 - Executive powers: investigate (never the same player twice), peek three,
   special election, execute — each with a private result and explicit close.
+- Communist expansion at 11–13 players: a 26-card deck (Fascist and Communist
+  policies), a separate Communist track with its own powers, the secret
+  Radicalisation and Confession steps, Five-Year Plan, and the joint
+  Hitler-execution victory for Communists and Liberals.
 - Game-over screen for all victory paths with final policy counts.
 - English/Persian, dark/light/high-contrast themes, RTL, Persian digits,
   sound/haptics/animation switches, board scale, orientation preference.
@@ -202,21 +209,24 @@ src/
 
 ## Tests
 
-Verified in this environment on 2026-10-29:
+Verified in this environment on 2026-10-30:
 
-- `pnpm test` — 52 unit tests pass: role table over 10,000 runs per player
-  count, deck/reshuffle, tracker, term limits, veto, powers, all victories, save
-  parsing and phase data validation, settings migration, i18n key parity, and
-  WCAG AA theme contrast.
-- `pnpm e2e` — 17 Playwright tests pass: setup → reveals → nomination → vote →
+- `pnpm test` — 138 unit tests pass: role table over 10,000 runs per player
+  count, deck/reshuffle, tracker, term limits, veto, powers, all victories,
+  expansion rules (Communist track, Radicalisation, Confession, Five-Year Plan,
+  joint victory), public-view privacy, save v1→v2 migration and phase data
+  validation, settings migration, i18n key parity, and WCAG AA theme contrast.
+- `pnpm e2e` — 36 Playwright tests pass: setup → reveals → nomination → vote →
   legislative → reload/resume, duplicate names, newer-save refusal, the
   face-down/flip role card (pre-flip absence, keyboard, reduced motion, FA/RTL),
   role-hide and vote-cancel safety, the routine-confirmation toggle, Persian
   RTL/theme persistence, how-to-play, a full five-player UI game to a liberal
-  policy victory, and 360×640 dp portrait/landscape layouts without overflow.
+  policy victory, the 11–13 player expansion flows in both languages, and
+  360×640 dp portrait/landscape layouts without overflow (the 13-player board
+  scrolls vertically in landscape, by design).
 - `pnpm build` — typecheck and production build pass.
 - `pnpm check:rust` — the Tauri shell compiles on Linux.
-- Android release APK — builds and is statically verified as described above.
+- Android release APK — built by CI and statically verified as described above.
 
 Not run: launching the APK on an Android device or emulator, iOS builds, and a
 desktop GUI launch. Only the browser app, the Rust compile and the APK packaging
@@ -237,6 +247,9 @@ are covered by evidence.
   emulators or 32-bit devices, and it is not Play-Store distributable.
 - Android runtime behavior is unverified: the APK was built and statically
   checked but never launched on a device.
+- The 11–13 player expansion is fan-made and has had less table testing than
+  the base game. The 13-player board needs vertical scrolling in a 640×360
+  landscape viewport (no horizontal overflow).
 - Desktop windows are supported for development; only Android is the intended
   shipping target.
 

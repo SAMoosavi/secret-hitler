@@ -1,5 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 import { createGame as createEngineGame } from '../src/game/engine'
+import { partyForRole } from '../src/game/constants'
 import { seededRng } from '../src/game/rng'
 import type { GameState, Policy, Role } from '../src/game/types'
 import { NAMES, confirmWith, createGame, electGovernment, hideRole, revealAllRoles, revealFirstCard } from './helpers'
@@ -15,7 +16,11 @@ function roleRevealSave(roles: Role[]): GameState {
     ...created.state,
     phase: 'roleReveal',
     revealIndex: 0,
-    players: created.state.players.map((player, index) => ({ ...player, role: roles[index] })),
+    players: created.state.players.map((player, index) => ({
+      ...player,
+      role: roles[index],
+      party: partyForRole(roles[index]),
+    })),
   }
 }
 

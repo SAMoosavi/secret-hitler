@@ -34,6 +34,24 @@ const knowledge = computed(() => {
 const total = computed(() => state.value?.players.length ?? 0)
 const isLast = computed(() => !!state.value && state.value.revealIndex + 1 >= state.value.players.length)
 const role = computed<Role>(() => player.value?.role ?? 'liberal')
+const expansion = computed(() => state.value?.expansion === 'communist')
+const roleLabel = computed(() =>
+  role.value === 'communist' ? t('reveal.roleCommunist') : t(`reveal.${role.value}`),
+)
+const roleIcon = computed(() => (role.value === 'liberal' ? 'sun' : role.value === 'communist' ? 'star' : 'crest'))
+const cardSkin = computed(() =>
+  role.value === 'liberal' ? 'liberal' : role.value === 'communist' ? 'communist' : 'fascist',
+)
+const partyLabel = computed(() =>
+  role.value === 'communist'
+    ? t('reveal.partyLine', { party: t('reveal.partyCommunist') })
+    : role.value === 'liberal'
+      ? t('reveal.teamLiberal')
+      : t('reveal.teamFascist'),
+)
+const cardA11y = computed(() =>
+  role.value === 'communist' ? t('reveal.communistCardA11y') : undefined,
+)
 
 watch(
   () => game.state?.phase,
@@ -152,12 +170,13 @@ async function exit(): Promise<void> {
                 ref="frontFace"
                 tabindex="-1"
                 class="policy-card role-card-face role-card-front"
-                :class="role === 'liberal' ? 'liberal' : 'fascist'"
+                :class="cardSkin"
+                :aria-label="cardA11y"
               >
-                <AppIcon :name="role === 'liberal' ? 'sun' : 'crest'" :size="40" />
-                <h1 class="text-3xl font-bold">{{ t(`reveal.${role}`) }}</h1>
+                <AppIcon :name="roleIcon" :size="40" />
+                <h1 class="text-3xl font-bold">{{ roleLabel }}</h1>
                 <p class="px-2 text-center text-[0.65rem] font-extrabold uppercase tracking-widest">
-                  {{ role === 'liberal' ? t('reveal.teamLiberal') : t('reveal.teamFascist') }}
+                  {{ partyLabel }}
                 </p>
               </div>
             </div>
@@ -170,7 +189,13 @@ async function exit(): Promise<void> {
               <p class="eyebrow">{{ t('reveal.knowledgeTitle') }}</p>
               <template v-if="knowledge">
                 <p v-if="knowledge.role === 'liberal'" class="mt-1 text-sm text-muted">
-                  {{ t('reveal.noKnowledge') }}
+                  {{ expansion ? t('reveal.knowledgeNoOne') : t('reveal.noKnowledge') }}
+                </p>
+                <p v-else-if="expansion && knowledge.role === 'hitler'" class="mt-1 text-sm text-muted">
+                  {{ t('reveal.knowledgeHitlerAlone') }}
+                </p>
+                <p v-else-if="expansion && knowledge.role === 'communist'" class="mt-1 text-sm font-semibold">
+                  {{ t('reveal.knowledgeCommunists', { names: knowledge.communists.join(locale === 'fa' ? '، ' : ', ') }) }}
                 </p>
                 <template v-else>
                   <p v-if="knowledge.hitler" class="mt-1 text-sm font-semibold">

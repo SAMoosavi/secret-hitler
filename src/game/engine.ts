@@ -2,14 +2,18 @@ import {
   HAND_SIZE,
   LIBERAL_TRACK,
   FASCIST_TRACK,
+  COMMUNIST_TRACK,
   MAX_PLAYERS,
   MIN_PLAYERS,
   TRACKER_MAX,
+  communistPowerFor,
+  isExpansion,
+  partyForRole,
   powerFor,
   roleCounts,
   rolesFor,
 } from './constants'
-import { drawCards, makeDeck, peekCards } from './deck'
+import { drawCards, growDeckForFiveYearPlan, makeDeck, peekCards } from './deck'
 import { secureRng, shuffle, type Rng } from './rng'
 import type {
   ActionResult,
@@ -79,11 +83,13 @@ export function createGame(
     id: i,
     name: normalizeName(raw, i),
     role: shuffledRoles[i],
+    party: partyForRole(shuffledRoles[i]),
     alive: true,
   }))
 
   const state: GameState = {
-    schemaVersion: 1,
+    schemaVersion: 2,
+    expansion: isExpansion(input.playerCount) ? 'communist' : null,
     id: meta.id ?? globalThis.crypto.randomUUID(),
     createdAt: meta.now ?? Date.now(),
     playerCount: input.playerCount,
@@ -96,7 +102,8 @@ export function createGame(
     lastChancellorId: null,
     enactedLiberal: 0,
     enactedFascist: 0,
-    deck: shuffle(makeDeck(), rng),
+    enactedCommunist: 0,
+    deck: shuffle(makeDeck(input.playerCount), rng),
     discard: [],
     tracker: 0,
     round: 1,
@@ -108,6 +115,9 @@ export function createGame(
     investigated: [],
     vetoUnlocked: false,
     specialReturnId: null,
+    confessions: [],
+    radicalisation: null,
+    confession: null,
     gameOver: null,
   }
   return { ok: true, state }
@@ -168,11 +178,14 @@ function startNextRound(state: GameState): void {
   state.pendingAction = null
   state.peeked = null
   state.investigation = null
+  state.radicalisation = null
+  state.confession = null
 }
 
 function enactPolicy(state: GameState, policy: Policy): void {
   if (policy === 'liberal') state.enactedLiberal += 1
-  else state.enactedFascist += 1
+  else if (policy === 'fascist') state.enactedFascist += 1
+  else state.enactedCommunist += 1
   state.tracker = 0
   if (state.enactedFascist >= 5) state.vetoUnlocked = true
 }
@@ -185,15 +198,21 @@ function setGameOver(state: GameState, over: GameOver): void {
   state.peeked = null
   state.investigation = null
   state.nomineeId = null
+  state.radicalisation = null
+  state.confession = null
 }
 
 function checkPolicyVictory(state: GameState): boolean {
+  if (isExpansion(state.playerCount) && state.enactedCommunist >= COMMUNIST_TRACK) {
+    setGameOver(state, { winners: ['communist'], reason: 'communistPolicies' })
+    return true
+  }
   if (state.enactedLiberal >= LIBERAL_TRACK) {
-    setGameOver(state, { winner: 'liberal', reason: 'liberalPolicies' })
+    setGameOver(state, { winners: ['liberal'], reason: 'liberalPolicies' })
     return true
   }
   if (state.enactedFascist >= FASCIST_TRACK) {
-    setGameOver(state, { winner: 'fascist', reason: 'fascistPolicies' })
+    setGameOver(state, { winners: ['fascist'], reason: 'fascistPolicies' })
     return true
   }
   return false
@@ -283,7 +302,7 @@ function apply(state: GameState, action: GameAction, rng: Rng): RuleError | null
       state.lastChancellorId = chancellor.id
       state.tracker = 0
       if (chancellor.role === 'hitler' && state.enactedFascist >= 3) {
-        setGameOver(state, { winner: 'fascist', reason: 'hitlerElected' })
+        setGameOver(state, { winners: ['fascist'], reason: 'hitlerElected' })
         return null
       }
       beginLegislative(state, rng)
@@ -324,6 +343,25 @@ function apply(state: GameState, action: GameAction, rng: Rng): RuleError | null
       enactPolicy(state, card)
       state.legislative = null
       if (checkPolicyVictory(state)) return null
+
+      if (card === 'communist') {
+        const power = communistPowerFor(state.playerCount, state.enactedCommunist)
+        if (power === 'fiveYearPlan') {
+          state.deck = growDeckForFiveYearPlan(state.deck, rng)
+        }
+        if (power !== 'none') {
+          state.pendingAction = { type: power, actorId: state.presidentId }
+          state.phase = 'communistPower'
+          if (power === 'confession') {
+            // Snapshot now: a later conversion must not rewrite the public record.
+            const president = playerById(state, state.presidentId)!
+            state.confession = { playerId: president.id, party: president.party }
+          }
+          return null
+        }
+        startNextRound(state)
+        return null
+      }
 
       const power = card === 'fascist' ? powerFor(state.playerCount, state.enactedFascist) : 'none'
       if (power !== 'none') {
@@ -375,7 +413,7 @@ function apply(state: GameState, action: GameAction, rng: Rng): RuleError | null
       state.investigated.push(target.id)
       state.investigation = {
         playerId: target.id,
-        party: target.role === 'liberal' ? 'liberal' : 'fascist',
+        party: target.party,
       }
       return null
     }
@@ -418,6 +456,8 @@ function apply(state: GameState, action: GameAction, rng: Rng): RuleError | null
       state.pendingAction = null
       state.peeked = null
       state.investigation = null
+      state.radicalisation = null
+      state.confession = null
       return null
     }
 
@@ -433,9 +473,78 @@ function apply(state: GameState, action: GameAction, rng: Rng): RuleError | null
       state.peeked = null
       state.investigation = null
       if (target.role === 'hitler') {
-        setGameOver(state, { winner: 'liberal', reason: 'hitlerExecuted' })
+        setGameOver(state, {
+          winners: isExpansion(state.playerCount) ? ['liberal', 'communist'] : ['liberal'],
+          reason: 'hitlerExecuted',
+        })
         return null
       }
+      startNextRound(state)
+      return null
+    }
+
+    case 'radicalise': {
+      const phaseError = requirePhase(state, 'communistPower')
+      if (phaseError) return phaseError
+      if (state.pendingAction?.type !== 'radicalise') return fail('invalidPhase')
+      const targetError = requireLivingTarget(state, action.playerId)
+      if (targetError) return targetError
+      const target = playerById(state, action.playerId)!
+      const before = target.party
+      const after =
+        target.role !== 'hitler' && before !== 'communist' ? ('communist' as const) : before
+      target.party = after
+      state.radicalisation = { targetId: target.id, before, after, revealIndex: 0 }
+      state.pendingAction = null
+      state.phase = 'radicalisationReveal'
+      return null
+    }
+
+    case 'nextRadicalisationReveal': {
+      const phaseError = requirePhase(state, 'radicalisationReveal')
+      if (phaseError) return phaseError
+      if (!state.radicalisation) return fail('invalidPhase')
+      const living = livingPlayers(state).length
+      if (state.radicalisation.revealIndex >= living) return fail('invalidPhase')
+      state.radicalisation.revealIndex = Math.min(state.radicalisation.revealIndex + 1, living)
+      return null
+    }
+
+    case 'finishRadicalisation': {
+      const phaseError = requirePhase(state, 'radicalisationReveal')
+      if (phaseError) return phaseError
+      if (!state.radicalisation) return fail('invalidPhase')
+      if (state.radicalisation.revealIndex < livingPlayers(state).length) {
+        return fail('invalidPhase')
+      }
+      state.radicalisation = null
+      state.pendingAction = null
+      startNextRound(state)
+      return null
+    }
+
+    case 'acknowledgeFiveYearPlan': {
+      const phaseError = requirePhase(state, 'communistPower')
+      if (phaseError) return phaseError
+      if (state.pendingAction?.type !== 'fiveYearPlan') return fail('invalidPhase')
+      state.pendingAction = null
+      startNextRound(state)
+      return null
+    }
+
+    case 'acknowledgeConfession': {
+      const phaseError = requirePhase(state, 'communistPower')
+      if (phaseError) return phaseError
+      if (state.pendingAction?.type !== 'confession' || !state.confession) {
+        return fail('invalidPhase')
+      }
+      state.confessions.push({
+        playerId: state.confession.playerId,
+        party: state.confession.party,
+        round: state.round,
+      })
+      state.confession = null
+      state.pendingAction = null
       startNextRound(state)
       return null
     }
@@ -457,8 +566,23 @@ export function transition(state: GameState, action: GameAction, rng: Rng = secu
 
 export function knowledgeFor(state: GameState, playerId: number): KnowledgeEntry {
   const player = playerById(state, playerId)
-  if (!player) return { role: 'liberal', fascists: [], hitler: null }
-  if (player.role === 'liberal') return { role: 'liberal', fascists: [], hitler: null }
+  if (!player) {
+    return { role: 'liberal', party: 'liberal', fascists: [], hitler: null, communists: [] }
+  }
+  if (player.role === 'liberal') {
+    return { role: 'liberal', party: player.party, fascists: [], hitler: null, communists: [] }
+  }
+  if (player.role === 'communist') {
+    return {
+      role: 'communist',
+      party: player.party,
+      fascists: [],
+      hitler: null,
+      communists: state.players
+        .filter((p) => p.role === 'communist' && p.id !== player.id)
+        .map((p) => p.name),
+    }
+  }
 
   const fascists = state.players.filter((p) => p.role === 'fascist')
   const hitler = state.players.find((p) => p.role === 'hitler')
@@ -467,20 +591,54 @@ export function knowledgeFor(state: GameState, playerId: number): KnowledgeEntry
   if (player.role === 'hitler') {
     return {
       role: 'hitler',
+      party: player.party,
       fascists: state.playerCount <= 6 ? fascists.map((p) => p.name) : [],
       hitler: null,
+      communists: [],
     }
   }
   return {
     role: 'fascist',
+    party: player.party,
     fascists: fascists.filter((p) => p.id !== player.id).map((p) => p.name),
     hitler: hitlerName,
+    communists: [],
   }
+}
+
+export type SecretStep =
+  | 'radicalisePick'
+  | 'fiveYearPlan'
+  | 'confession'
+  | 'radicaliseReveal'
+  | 'radicaliseDone'
+  | null
+
+/** The current pass-the-phone step, derived from persisted state only. */
+export function secretStep(state: GameState): SecretStep {
+  if (state.phase === 'communistPower') {
+    switch (state.pendingAction?.type) {
+      case 'radicalise':
+        return 'radicalisePick'
+      case 'fiveYearPlan':
+        return 'fiveYearPlan'
+      case 'confession':
+        return 'confession'
+      default:
+        return null
+    }
+  }
+  if (state.phase === 'radicalisationReveal' && state.radicalisation) {
+    const living = state.players.filter((p) => p.alive).length
+    return state.radicalisation.revealIndex >= living ? 'radicaliseDone' : 'radicaliseReveal'
+  }
+  return null
 }
 
 export function selectPublicView(state: GameState): PublicView {
   return {
     schemaVersion: state.schemaVersion,
+    expansion: state.expansion,
     id: state.id,
     playerCount: state.playerCount,
     players: state.players.map((p) => ({ id: p.id, name: p.name, alive: p.alive })),
@@ -492,6 +650,12 @@ export function selectPublicView(state: GameState): PublicView {
     lastChancellorId: state.lastChancellorId,
     enactedLiberal: state.enactedLiberal,
     enactedFascist: state.enactedFascist,
+    ...(isExpansion(state.playerCount)
+      ? {
+          enactedCommunist: state.enactedCommunist,
+          confessions: state.confessions.map((confession) => ({ ...confession })),
+        }
+      : {}),
     deckCount: state.deck.length,
     discardCount: state.discard.length,
     tracker: state.tracker,
@@ -499,6 +663,8 @@ export function selectPublicView(state: GameState): PublicView {
     vetoUnlocked: state.vetoUnlocked,
     investigated: [...state.investigated],
     pendingActionType: state.pendingAction?.type ?? null,
-    gameOver: state.gameOver ? { ...state.gameOver } : null,
+    gameOver: state.gameOver
+      ? { winners: [...state.gameOver.winners], reason: state.gameOver.reason }
+      : null,
   }
 }

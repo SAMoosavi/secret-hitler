@@ -235,6 +235,7 @@ async function clearSave(): Promise<void> {
     <AppDialog :open="about" :title="t('about.title')" @close="about = false">
       <p class="text-sm leading-relaxed">{{ t('about.body') }}</p>
       <p class="mt-2 text-sm leading-relaxed text-muted">{{ t('about.attribution') }}</p>
+      <p class="mt-2 text-sm leading-relaxed text-muted">{{ t('about.expansionAttribution') }}</p>
       <p class="mt-2 text-sm leading-relaxed text-muted">{{ t('about.license') }}</p>
       <p class="mt-2 text-xs text-muted">{{ t('about.source') }}</p>
       <template #actions>

@@ -1,4 +1,4 @@
-import { DECK_FASCIST, DECK_LIBERAL } from './constants'
+import { deckRecipeFor } from './constants'
 import { shuffle, type Rng } from './rng'
 import type { Policy } from './types'
 
@@ -7,11 +7,18 @@ export interface DeckState {
   discard: Policy[]
 }
 
-export function makeDeck(): Policy[] {
+export function makeDeck(playerCount: number): Policy[] {
+  const recipe = deckRecipeFor(playerCount)
   return [
-    ...Array<Policy>(DECK_LIBERAL).fill('liberal'),
-    ...Array<Policy>(DECK_FASCIST).fill('fascist'),
+    ...Array<Policy>(recipe.liberal).fill('liberal'),
+    ...Array<Policy>(recipe.fascist).fill('fascist'),
+    ...Array<Policy>(recipe.communist).fill('communist'),
   ]
+}
+
+/** AC-11: add exactly 2 Communist + 1 Liberal to the draw deck and shuffle it. */
+export function growDeckForFiveYearPlan(deck: Policy[], rng: Rng): Policy[] {
+  return shuffle([...deck, 'communist', 'communist', 'liberal'], rng)
 }
 
 /**

@@ -7,8 +7,10 @@ import GameBoard from '../components/board/GameBoard.vue'
 import VotingPanel from '../components/game/VotingPanel.vue'
 import LegislativePanel from '../components/game/LegislativePanel.vue'
 import ExecutivePanel from '../components/game/ExecutivePanel.vue'
+import RadicalisationPanel from '../components/game/RadicalisationPanel.vue'
+import ConfessionPanel from '../components/game/ConfessionPanel.vue'
 import GameOverPanel from '../components/game/GameOverPanel.vue'
-import { eligibility, eligibilities } from '../game/engine'
+import { eligibility, eligibilities, secretStep } from '../game/engine'
 import { confirmAction } from '../stores/confirm'
 import { useGameStore } from '../stores/game'
 import { useSettingsStore } from '../stores/settings'
@@ -23,14 +25,19 @@ const game = useGameStore()
 const settings = useSettingsStore()
 
 const selectedId = ref<number | null>(null)
-// A resumed save can reopen a private phase (or a hidden executive result), so
-// the board stays behind a cover until the operator confirms (AC-27). Native
-// dialogs render in the top layer, so the panels are unmounted while covered.
+// A resumed save can reopen a private phase (a reveal, a secret action or a
+// hidden executive result), so the board stays behind a cover until the
+// operator confirms. Native dialogs render in the top layer, so the panels are
+// unmounted while covered.
 const shield = ref(
   game.restored ||
     (!!game.state &&
-      game.state.phase === 'executive' &&
-      (!!game.state.investigation || !!game.state.peeked)),
+      (game.state.phase === 'roleReveal' ||
+        game.state.phase === 'communistPower' ||
+        game.state.phase === 'radicalisationReveal' ||
+        secretStep(game.state) !== null ||
+        (game.state.phase === 'executive' &&
+          (!!game.state.investigation || !!game.state.peeked)))),
 )
 
 const state = computed(() => game.state)
@@ -212,8 +219,12 @@ function showBoard(): void {
         <section v-else-if="view.phase !== 'gameOver'" class="panel p-3">
           <p class="eyebrow">{{ t('game.phase') }}</p>
           <p class="mt-1 text-lg font-bold">{{ t(`phases.${view.phase}`) }}</p>
-          <p class="mt-1 text-xs text-muted">
-            {{ view.phase === 'executive' ? t('game.powerInfo') : t('reveal.privacy') }}
+          <p v-if="view.phase !== 'radicalisationReveal'" class="mt-1 text-xs text-muted">
+            {{
+              view.phase === 'executive' || view.phase === 'communistPower'
+                ? t('game.powerInfo')
+                : t('reveal.privacy')
+            }}
           </p>
         </section>
 
@@ -234,7 +245,11 @@ function showBoard(): void {
     />
 
     <ExecutivePanel
-      v-if="!shield && state.phase === 'executive'"
+      v-if="
+        !shield &&
+        (state.phase === 'executive' ||
+          (state.phase === 'communistPower' && state.pendingAction?.type === 'fiveYearPlan'))
+      "
       :state="state"
       :busy="game.busy"
       @investigate="act({ type: 'investigate', playerId: $event })"
@@ -242,6 +257,31 @@ function showBoard(): void {
       @acknowledge-peek="act({ type: 'acknowledgePeek' })"
       @special-election="act({ type: 'specialElection', playerId: $event })"
       @execute="act({ type: 'execute', playerId: $event })"
+      @acknowledge-five-year-plan="act({ type: 'acknowledgeFiveYearPlan' })"
+    />
+
+    <RadicalisationPanel
+      v-if="
+        !shield &&
+        (state.phase === 'radicalisationReveal' ||
+          (state.phase === 'communistPower' && state.pendingAction?.type === 'radicalise'))
+      "
+      :state="state"
+      :busy="game.busy"
+      @radicalise="act({ type: 'radicalise', playerId: $event })"
+      @next-reveal="act({ type: 'nextRadicalisationReveal' })"
+      @finish="act({ type: 'finishRadicalisation' })"
+    />
+
+    <ConfessionPanel
+      v-if="
+        !shield &&
+        state.phase === 'communistPower' &&
+        state.pendingAction?.type === 'confession'
+      "
+      :state="state"
+      :busy="game.busy"
+      @acknowledge="act({ type: 'acknowledgeConfession' })"
     />
 
     <GameOverPanel v-if="!shield && state.phase === 'gameOver'" :state="state" />
