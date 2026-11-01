@@ -43,11 +43,11 @@ Install by opening the release on the phone, downloading the APK, allowing
 installs from that source, and tapping the file. For a USB install:
 
 ```bash
-adb install -r secret-hitler-companion-0.4.0-arm64-release.apk
+adb install -r secret-hitler-companion-0.5.0-arm64-release.apk
 ```
 
-What the artifact is: package `app.secrethitler.companion`, version `0.4.0`
-(versionCode 4000), `minSdk 24`, `targetSdk 37`, native code for **`arm64-v8a`
+What the artifact is: package `app.secrethitler.companion`, version `0.5.0`
+(versionCode 5000), `minSdk 24`, `targetSdk 37`, native code for **`arm64-v8a`
 only** (no x86_64 emulator build), R8-minified and **not debuggable** — a real
 release build. It is signed with the project's Android **debug** key (same
 certificate as the earlier debug builds) so it installs over them; it is still
@@ -57,7 +57,7 @@ Static checks on the published file:
 
 - `apksigner verify --print-certs` — v2 scheme, cert SHA-256 `da9d93d2…cfd2`
   (the workflow refuses to publish a different key).
-- `aapt2 dump badging` — package/version `0.4.0` (versionCode 4000),
+- `aapt2 dump badging` — package/version `0.5.0` (versionCode 5000),
   `minSdkVersion 24`, `targetSdkVersion 37`, `native-code: 'arm64-v8a'`, no
   `debuggable` flag, and no `android.permission.INTERNET`.
 - The frontend bundle and Vazirmatn fonts are embedded in

@@ -85,14 +85,9 @@ async function flip(): Promise<void> {
 }
 
 async function hide(): Promise<void> {
+  // The card is already face down under the thumb; asking again would only
+  // delay the hand-off to the next player.
   if (!player.value || game.busy) return
-  const ok = await confirmAction({
-    title: t('reveal.hideTitle'),
-    message: isLast ? t('reveal.hideBodyLast') : t('reveal.hideBody'),
-    confirmLabel: t('reveal.hideConfirm'),
-    danger: true,
-  })
-  if (!ok) return
   shown.value = false
   flipped.value = false
   const committed = await game.commit({ type: 'nextReveal' })
@@ -161,7 +156,7 @@ async function exit(): Promise<void> {
                 @click="flipped ? undefined : flip()"
               >
                 <AppIcon name="lock" :size="34" />
-                <span class="text-[0.62rem] font-extrabold uppercase tracking-widest">
+                <span class="px-1 text-center text-xs font-extrabold uppercase leading-tight tracking-wider">
                   {{ t('reveal.tapToReveal') }}
                 </span>
               </component>
@@ -175,7 +170,7 @@ async function exit(): Promise<void> {
               >
                 <AppIcon :name="roleIcon" :size="40" />
                 <h1 class="text-3xl font-bold">{{ roleLabel }}</h1>
-                <p class="px-2 text-center text-[0.65rem] font-extrabold uppercase tracking-widest">
+                <p class="px-2 text-center text-xs font-extrabold uppercase tracking-wider">
                   {{ partyLabel }}
                 </p>
               </div>

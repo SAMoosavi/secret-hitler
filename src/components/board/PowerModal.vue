@@ -12,11 +12,18 @@ const props = defineProps<{
   open: boolean
   power: ActivePower
   index: number
-  enactedFascist: number
+  /** Policies already enacted on the track this space belongs to. */
+  enacted: number
+  /** Which board the space sits on: only the fascist board has executive actions. */
+  track?: 'fascist' | 'communist'
   active: boolean
 }>()
 const emit = defineEmits<{ close: [] }>()
 const { t, locale } = useI18n()
+
+const title = computed(() =>
+  props.track === 'communist' ? t('board.communistTrack') : t('game.powerInfo'),
+)
 
 const meta = computed(() => {
   switch (props.power) {
@@ -41,6 +48,24 @@ const meta = computed(() => {
         eligibility: t('executive.eligibilitySpecial'),
         icon: 'ballot' as const,
       }
+    case 'radicalise':
+      return {
+        name: t('setup.powerRadicalise'),
+        desc: t('board.powerRadicaliseDesc'),
+        icon: 'sparkles' as const,
+      }
+    case 'fiveYearPlan':
+      return {
+        name: t('setup.powerFiveYearPlan'),
+        desc: t('board.powerFiveYearPlanDesc'),
+        icon: 'cards' as const,
+      }
+    case 'confession':
+      return {
+        name: t('setup.powerConfession'),
+        desc: t('board.powerConfessionDesc'),
+        icon: 'eye' as const,
+      }
     default:
       return {
         name: t('executive.powerExecute'),
@@ -53,13 +78,13 @@ const meta = computed(() => {
 
 const availability = computed(() => {
   if (props.active) return t('game.powerNow')
-  if (props.index + 1 <= props.enactedFascist) return t('game.powerResolved')
+  if (props.index + 1 <= props.enacted) return t('game.powerResolved')
   return t('game.powerAfter', { n: formatNumber(props.index + 1, locale.value) })
 })
 </script>
 
 <template>
-  <AppDialog :open="open" :title="t('game.powerInfo')" @close="emit('close')">
+  <AppDialog :open="open" :title="title" @close="emit('close')">
     <div class="flex items-start gap-3">
       <span class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg border border-gold/40 bg-gold/10 text-gold">
         <AppIcon :name="meta.icon" :size="26" />
@@ -71,15 +96,17 @@ const availability = computed(() => {
     </div>
     <dl class="mt-4 grid gap-2 text-sm">
       <div class="rounded-lg border border-line bg-surface-2/60 p-2.5">
-        <dt class="eyebrow">{{ t('game.powerInfo') }}</dt>
+        <dt class="eyebrow">{{ title }}</dt>
         <dd class="mt-0.5">{{ availability }}</dd>
       </div>
-      <div class="rounded-lg border border-line bg-surface-2/60 p-2.5">
+      <div
+        v-if="meta.eligibility"
+        class="rounded-lg border border-line bg-surface-2/60 p-2.5"
+      >
         <dt class="eyebrow">{{ t('game.eligible') }}</dt>
         <dd class="mt-0.5">{{ meta.eligibility }}</dd>
       </div>
     </dl>
-    <p class="mt-3 text-xs text-muted">{{ t('game.closeInfo') }}</p>
     <template #actions>
       <button type="button" class="btn btn-primary" @click="emit('close')">
         {{ t('common.close') }}

@@ -13,7 +13,6 @@ export interface Settings {
   haptics: boolean
   animations: boolean
   orientation: 'auto' | 'landscape'
-  privacy: boolean
   confirmReversible: boolean
   boardScale: number
   autoResume: boolean
@@ -29,8 +28,7 @@ const defaults = (): Settings => ({
   sound: true,
   haptics: true,
   animations: true,
-  orientation: 'landscape',
-  privacy: true,
+  orientation: 'auto',
   confirmReversible: false,
   boardScale: 1,
   autoResume: false,
@@ -77,7 +75,7 @@ export const useSettingsStore = defineStore('settings', () => {
           if (!['en', 'fa'].includes(merged.locale)) merged.locale = 'en'
           if (!['dark', 'light'].includes(merged.theme)) merged.theme = 'dark'
           if (!['normal', 'high'].includes(merged.contrast)) merged.contrast = 'normal'
-          if (!['auto', 'landscape'].includes(merged.orientation)) merged.orientation = 'landscape'
+          if (!['auto', 'landscape'].includes(merged.orientation)) merged.orientation = 'auto'
           // v2: routine confirmations are off unless the user turns them back on.
           if (version < 2) merged.confirmReversible = false
           settings.value = merged

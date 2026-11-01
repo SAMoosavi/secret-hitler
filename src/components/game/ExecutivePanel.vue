@@ -155,8 +155,8 @@ async function acknowledgeInvestigation(): Promise<void> {
     </template>
 
     <template v-else-if="power === 'peek'">
-      <div v-if="!peekRevealed" class="mt-4 flex flex-col items-center gap-3 rounded-xl border border-dashed border-line bg-surface-2/50 p-4">
-        <div class="flex gap-2">
+      <div v-if="!peekRevealed" class="mt-4 flex flex-col items-center gap-3">
+        <div class="hand-fan">
           <PolicyCard v-for="n in 3" :key="n" size="md" />
         </div>
         <p class="text-sm font-bold">{{ t('executive.peekHint') }}</p>
@@ -169,7 +169,7 @@ async function acknowledgeInvestigation(): Promise<void> {
         <div class="flex flex-wrap items-end justify-center gap-2">
           <div v-for="(policy, index) in state.peeked ?? []" :key="index" class="flex flex-col items-center gap-1">
             <PolicyCard :policy="policy" face-up size="lg" />
-            <span class="text-[0.65rem] font-bold text-muted">{{ index + 1 }}</span>
+            <span class="text-xs font-bold text-muted">{{ index + 1 }}</span>
           </div>
         </div>
         <p class="mt-2 text-center text-xs text-muted">{{ t('executive.peekBody') }}</p>

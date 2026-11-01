@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppIcon from '../base/AppIcon.vue'
+import PolicyCard from '../base/PolicyCard.vue'
 import type { IconName } from '../base/icons'
 import {
   COMMUNIST_TRACK,
@@ -40,9 +41,9 @@ function powerAt(index: number): Power {
   return powerFor(props.playerCount, index + 1)
 }
 
-/** Only the Fascist board opens the power card; the Communist track is read-only. */
+/** A tap opens the power card; the Liberal track carries no powers. */
 function interactive(index: number): boolean {
-  return props.kind === 'fascist' && powerAt(index) !== 'none'
+  return props.kind !== 'liberal' && powerAt(index) !== 'none'
 }
 
 function powerName(power: Power): string {
@@ -107,20 +108,6 @@ function spaceIcon(index: number): IconName | null {
   return props.kind === 'fascist' && index + 1 === total.value ? 'crown' : null
 }
 
-/**
- * The powers do not fit in a 1/6 column, so list them once as text:
- * "2, 4 Radicalisation · 3 Five-Year Plan · 5 Confession · 6 Victory".
- */
-const legend = computed(() => {
-  const groups = new Map<string, number[]>()
-  for (let index = 1; index < total.value; index += 1) {
-    const label = index + 1 === total.value ? t('setup.powerVictory') : powerName(powerAt(index))
-    if (!label) continue
-    groups.set(label, [...(groups.get(label) ?? []), index + 1])
-  }
-  return [...groups].map(([label, spaces]) => `${spaces.map(num).join(', ')} ${label}`).join(' · ')
-})
-
 function activate(index: number): void {
   if (!interactive(index)) return
   emit('info', powerAt(index) as Exclude<Power, 'none'>, index)
@@ -128,54 +115,48 @@ function activate(index: number): void {
 </script>
 
 <template>
-  <section class="panel p-2" :aria-label="title">
-    <header class="mb-1.5 flex items-center justify-between gap-2 px-1">
-      <span class="flex items-center gap-1.5 text-[0.68rem] font-extrabold uppercase tracking-wider">
-        <AppIcon :name="trackIcon" :size="15" />
+  <section :aria-label="title" class="min-w-0">
+    <header class="mb-0.5 flex items-center justify-between gap-2 px-0.5">
+      <span
+        class="flex items-center gap-1.5 text-xs font-extrabold uppercase tracking-wider text-ink-on-paper"
+      >
+        <AppIcon :name="trackIcon" :size="14" />
         {{ title }}
       </span>
-      <span class="text-[0.65rem] font-bold text-muted">
+      <span class="text-xs font-bold tabular-nums text-paper-muted">
         {{ num(enacted) }} / {{ num(total) }}
       </span>
     </header>
-    <ol class="flex gap-0.5">
-      <li v-for="index in total" :key="index" class="flex-1">
+    <ol class="track-row">
+      <li v-for="index in total" :key="index">
         <component
           :is="interactive(index - 1) ? 'button' : 'div'"
           :type="interactive(index - 1) ? 'button' : undefined"
-          class="track-space !h-14 w-full !rounded-md"
-          :class="[
-            index <= enacted ? 'enacted' : '',
-            interactive(index - 1) ? 'interactive' : '',
-            index <= enacted
-              ? kind === 'liberal'
-                ? '!border-liberal/70 bg-liberal/20 !text-liberal'
-                : kind === 'fascist'
-                  ? '!border-fascist/70 bg-fascist/20 !text-fascist'
-                  : '!border-communist/70 bg-communist/20 !text-communist'
-              : '',
-          ]"
+          class="track-space policy-slot board-slot relative w-full"
+          :class="interactive(index - 1) ? 'cursor-pointer hover:brightness-105' : ''"
           :aria-label="spaceLabel(index - 1)"
           :title="spaceLabel(index - 1)"
           @click="activate(index - 1)"
         >
-          <span v-if="index <= enacted" class="flex flex-col items-center gap-0.5">
-            <AppIcon :name="trackIcon" :size="kind === 'communist' ? 16 : 18" />
-            <AppIcon name="check" :size="11" class="text-gold" />
-          </span>
-          <span v-else class="flex flex-col items-center gap-0.5">
+          <PolicyCard
+            v-if="index <= enacted"
+            :policy="kind"
+            face-up
+            size="slot"
+            seated
+            :class="index % 2 === 0 ? 'tilt-r' : ''"
+          />
+          <span v-else class="m-auto flex flex-col items-center gap-0.5 text-ink-on-paper">
             <AppIcon
               v-if="spaceIcon(index - 1)"
               :name="spaceIcon(index - 1)!"
-              :size="kind === 'communist' ? 14 : index === total ? 16 : 17"
+              :size="14"
+              class="opacity-45"
             />
-            <span class="text-[0.62rem] font-bold">{{ num(index) }}</span>
+            <span class="text-xs font-bold tabular-nums">{{ num(index) }}</span>
           </span>
         </component>
       </li>
     </ol>
-    <p v-if="kind === 'communist'" class="mt-1 px-1 text-[0.58rem] leading-tight text-muted">
-      {{ legend }}
-    </p>
   </section>
 </template>

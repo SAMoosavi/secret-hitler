@@ -36,7 +36,50 @@
   --danger: #a12f2f;
   --danger-text: #e07a7a;
   --on-gold: #14100a;
-  --pattern-opacity: 0.05;
+
+  /* materials — dark walnut table, cream stock, aged brass */
+  --table: #241610;
+  --table-2: #170e09;
+  --table-glow: rgb(255 214 150 / 0.16);
+  --board: #f1e7cf;
+  --board-2: #e7dabc;
+  --board-edge: #a88f5f;
+  --paper: #f8f1de;
+  --ink-on-paper: #2a2318;
+  --paper-muted: #6b5c40;
+  --brass: #6f5318;
+  --brass-2: #4f3a0e;
+  --on-brass: #fdf3d8;
+  --oxblood: #7c1f1f;
+  --oxblood-2: #5c1414;
+  --shadow-card: 0 2px 3px rgb(0 0 0 / 0.35), 0 10px 22px rgb(0 0 0 / 0.45);
+  --shadow-lift: 0 10px 18px rgb(0 0 0 / 0.35), 0 22px 40px rgb(0 0 0 / 0.5);
+
+  /* shared material plumbing */
+  --radius-card: 4px;
+  --text-label: 0.75rem;
+  --text-name: 1rem;
+  --text-body: 1rem;
+  --surface-noise: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.06'/%3E%3C/svg%3E");
+  --grain-texture:
+    var(--surface-noise),
+    repeating-linear-gradient(93deg, rgb(0 0 0 / 0.14) 0 1px, transparent 1px 84px),
+    repeating-linear-gradient(91deg, rgb(255 255 255 / 0.02) 0 1px, transparent 1px 7px);
+  --table-texture:
+    var(--grain-texture),
+    radial-gradient(120% 95% at 16% -18%, var(--table-glow), transparent 62%),
+    linear-gradient(160deg, var(--table), var(--table-2));
+  --paper-texture:
+    var(--surface-noise), linear-gradient(165deg, rgb(255 255 255 / 0.4), transparent 60%);
+  --brass-texture: linear-gradient(180deg, color-mix(in srgb, var(--brass) 86%, #fff), var(--brass-2));
+
+  /* Printed card stock: a full party-colour face with cream ink, as in the box. */
+  --card-face-ink: #f8f0dc;
+  --card-liberal: #2b628f;
+  --card-fascist: #8d2222;
+  --card-communist: #2f6b45;
+  --card-back: #1a2330;
+  --card-back-ink: #dcc07c;
   color-scheme: dark;
 }
 
@@ -62,7 +105,31 @@
   --danger: #a32424;
   --danger-text: #a32424;
   --on-gold: #fff8e6;
-  --pattern-opacity: 0.07;
+
+  /* materials — pale oak table, brighter stock, darker ink */
+  --table: #ebdfc7;
+  --table-2: #f3ead8;
+  --table-glow: rgb(255 252 240 / 0.55);
+  --board: #fdf8ea;
+  --board-2: #f3e8cd;
+  --board-edge: #8a7448;
+  --paper: #fffaf0;
+  --ink-on-paper: #23201a;
+  --paper-muted: #5c4e35;
+  --brass: #6b4f14;
+  --brass-2: #4a350a;
+  --on-brass: #fff8e6;
+  --oxblood: #6e1a1a;
+  --oxblood-2: #4d1111;
+  --shadow-card: 0 2px 3px rgb(60 45 20 / 0.16), 0 10px 22px rgb(60 45 20 / 0.16);
+  --shadow-lift: 0 10px 18px rgb(60 45 20 / 0.2), 0 22px 40px rgb(60 45 20 / 0.18);
+  /* The printed deck is the same stock under daylight as under the lamp. */
+  --card-face-ink: #f8f0dc;
+  --card-liberal: #2b628f;
+  --card-fascist: #8d2222;
+  --card-communist: #2f6b45;
+  --card-back: #1a2330;
+  --card-back-ink: #dcc07c;
   color-scheme: light;
 }
 
@@ -77,6 +144,33 @@
   --surface: #0d1525;
   --surface-2: #16233a;
   --surface-3: #203252;
+
+  /* forced print: white stock, black ink, flat surfaces */
+  --table: #050a13;
+  --table-2: #050a13;
+  --table-glow: transparent;
+  --board: #ffffff;
+  --board-2: #ffffff;
+  --board-edge: #000000;
+  --paper: #ffffff;
+  --ink-on-paper: #000000;
+  --paper-muted: #262626;
+  --brass: #5c430e;
+  --brass-2: #3a2a06;
+  --on-brass: #ffffff;
+  --oxblood: #7a1717;
+  --oxblood-2: #4d0d0d;
+  --surface-noise: none;
+  --grain-texture: none;
+  --table-texture: none;
+  --paper-texture: none;
+  --brass-texture: none;
+  --card-face-ink: #ffffff;
+  --card-liberal: #14456d;
+  --card-fascist: #6d1414;
+  --card-communist: #1d5533;
+  --card-back: #000000;
+  --card-back-ink: #ffe08a;
 }
 
 [data-theme='light'][data-contrast='high'] {
@@ -90,6 +184,8 @@
   --surface: #ffffff;
   --surface-2: #f6efdd;
   --surface-3: #e8ddc4;
+  --table: #fffdf6;
+  --table-2: #fffdf6;
 }
 
 @theme inline {
@@ -106,6 +202,22 @@
   --color-fascist: var(--red);
   --color-communist: var(--green);
   --color-danger: var(--danger-text);
+  --color-table: var(--table);
+  --color-table-2: var(--table-2);
+  --color-board: var(--board);
+  --color-board-2: var(--board-2);
+  --color-board-edge: var(--board-edge);
+  --color-paper: var(--paper);
+  --color-ink-on-paper: var(--ink-on-paper);
+  --color-paper-muted: var(--paper-muted);
+  --color-brass: var(--brass);
+  --color-brass-2: var(--brass-2);
+  --color-on-brass: var(--on-brass);
+  --color-oxblood: var(--oxblood);
+  --color-oxblood-2: var(--oxblood-2);
+  --text-label: var(--text-label);
+  --text-name: var(--text-name);
+  --text-body: var(--text-body);
   --font-display: Georgia, 'Times New Roman', 'Vazirmatn', serif;
   --font-body:
     system-ui, -apple-system, 'Segoe UI', Tahoma, 'Vazirmatn', 'Noto Sans Arabic UI', sans-serif;
@@ -122,41 +234,26 @@ body,
 }
 
 html {
-  background: var(--bg);
+  background-color: var(--table);
 }
 
 body {
   margin: 0;
   color: var(--ink);
   font-family: var(--font-body);
-  background:
-    radial-gradient(1200px 700px at 18% -10%, color-mix(in srgb, var(--gold) 10%, transparent), transparent 60%),
-    radial-gradient(900px 600px at 100% 0%, color-mix(in srgb, var(--blue) 12%, transparent), transparent 55%),
-    linear-gradient(160deg, var(--bg), var(--bg-2));
-  background-attachment: fixed;
+  /* Solid table colour stays as the fallback when the texture is unavailable. */
+  background-color: var(--table);
+  background-image: var(--table-texture);
   -webkit-tap-highlight-color: transparent;
   text-rendering: optimizeLegibility;
 }
 
 [dir='rtl'] body,
-[dir='rtl'] .display,
 [dir='rtl'] h1,
 [dir='rtl'] h2,
 [dir='rtl'] h3 {
   font-family: 'Vazirmatn', system-ui, Tahoma, sans-serif;
   letter-spacing: 0;
-}
-
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: var(--pattern-opacity);
-  background-image:
-    repeating-linear-gradient(45deg, var(--ink) 0 1px, transparent 1px 9px),
-    repeating-linear-gradient(-45deg, var(--ink) 0 1px, transparent 1px 13px);
 }
 
 #app {
@@ -166,8 +263,7 @@ body::before {
 
 h1,
 h2,
-h3,
-.display {
+h3 {
   font-family: var(--font-display);
   letter-spacing: 0.01em;
 }
@@ -210,9 +306,6 @@ textarea {
   padding: 1rem;
   padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
 }
-.page-wide {
-  max-width: 72rem;
-}
 
 /* ---------- surfaces ---------- */
 .panel {
@@ -224,19 +317,6 @@ textarea {
 }
 .panel-raised {
   box-shadow: var(--shadow);
-}
-.board-surface {
-  min-width: 0;
-  border: 1px solid color-mix(in srgb, var(--gold) 35%, var(--line));
-  border-radius: 1rem;
-  background:
-    radial-gradient(80% 120% at 50% -20%, color-mix(in srgb, var(--gold) 10%, transparent), transparent 60%),
-    repeating-linear-gradient(90deg, color-mix(in srgb, var(--ink) 3%, transparent) 0 2px, transparent 2px 7px),
-    linear-gradient(155deg, var(--surface-2), var(--surface));
-  box-shadow: var(--shadow);
-}
-.hairline {
-  border-color: var(--line);
 }
 
 /* ---------- controls ---------- */
@@ -301,8 +381,8 @@ textarea {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 3rem;
-  height: 3rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border-radius: 999px;
   border: 1px solid var(--line);
   background: color-mix(in srgb, var(--surface-2) 70%, transparent);
@@ -372,8 +452,8 @@ textarea {
   inset-inline-start: calc(100% - 1.6rem);
 }
 .eyebrow {
-  font-size: 0.72rem;
-  letter-spacing: 0.16em;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
   color: var(--gold);
   font-weight: 800;
@@ -387,6 +467,8 @@ textarea {
 
 /* ---------- cards / tokens ---------- */
 .policy-card {
+  --face: var(--card-back);
+  --face-ink: var(--card-back-ink);
   position: relative;
   display: flex;
   flex-direction: column;
@@ -395,46 +477,117 @@ textarea {
   gap: 0.35rem;
   aspect-ratio: 5 / 7;
   width: 100%;
-  border-radius: 0.6rem;
-  border: 1px solid color-mix(in srgb, var(--gold) 35%, var(--line));
+  padding: 0.75rem;
+  border-radius: 5px;
+  border: 1px solid color-mix(in srgb, var(--face) 65%, #000);
+  background-color: var(--face);
+  background-image:
+    radial-gradient(circle at 50% 30%, rgb(255 255 255 / 0.1), transparent 62%),
+    var(--grain-texture);
   box-shadow:
-    var(--shadow-sm),
-    inset 0 0 0 3px rgb(255 255 255 / 0.06);
+    inset 0 1px 0 rgb(255 255 255 / 0.22),
+    var(--shadow-card);
+  color: var(--face-ink);
   overflow: hidden;
   user-select: none;
 }
 .policy-card.liberal {
-  background:
-    radial-gradient(circle at 50% 20%, rgb(255 255 255 / 0.18), transparent 55%),
-    linear-gradient(165deg, var(--blue), var(--blue-2));
-  color: #f2f7fb;
+  --face: var(--card-liberal);
+  --face-ink: var(--card-face-ink);
 }
 .policy-card.fascist {
-  background:
-    radial-gradient(circle at 50% 20%, rgb(255 255 255 / 0.14), transparent 55%),
-    linear-gradient(165deg, var(--red), var(--red-2));
-  color: #fbeeee;
+  --face: var(--card-fascist);
+  --face-ink: var(--card-face-ink);
 }
 .policy-card.communist {
-  background:
-    radial-gradient(circle at 50% 20%, rgb(255 255 255 / 0.16), transparent 55%),
-    linear-gradient(165deg, color-mix(in srgb, var(--green) 82%, #000), color-mix(in srgb, var(--green) 52%, #000));
-  color: #eefbf1;
-}
-.policy-card.back {
-  background:
-    repeating-linear-gradient(45deg, color-mix(in srgb, var(--gold) 18%, transparent) 0 2px, transparent 2px 8px),
-    linear-gradient(160deg, var(--surface-3), var(--surface));
-  color: var(--gold);
+  --face: var(--card-communist);
+  --face-ink: var(--card-face-ink);
 }
 .policy-card::after {
   content: '';
   position: absolute;
-  inset: 0.3rem;
-  border: 1px solid currentColor;
-  border-radius: 0.35rem;
-  opacity: 0.35;
+  inset: 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--face-ink) 45%, transparent);
+  border-radius: 2px;
   pointer-events: none;
+}
+.policy-card svg {
+  color: currentColor;
+}
+.policy-card.seated {
+  transform: rotate(-1.2deg);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--face-ink) 40%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    0 3px 5px rgb(0 0 0 / 0.35),
+    0 8px 14px rgb(0 0 0 / 0.28);
+}
+.policy-card.seated.tilt-r {
+  transform: rotate(1.2deg);
+}
+[dir='rtl'] .policy-card.seated {
+  transform: rotate(1.2deg);
+}
+[dir='rtl'] .policy-card.seated.tilt-r {
+  transform: rotate(-1.2deg);
+}
+
+/* A hand held in front of you: the cards overlap, the middle one sits proud. */
+.hand-fan {
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding-block: 0.4rem;
+}
+.hand-fan > .policy-card {
+  flex: 0 0 auto;
+  width: 4.6rem;
+}
+.hand-fan > .policy-card + .policy-card {
+  margin-inline-start: -1.35rem;
+}
+.hand-fan > .policy-card:nth-child(1) {
+  transform: rotate(-6deg);
+}
+.hand-fan > .policy-card:nth-child(2) {
+  transform: translateY(-0.4rem);
+}
+.hand-fan > .policy-card:nth-child(3) {
+  transform: rotate(6deg);
+}
+
+/* The card you are about to play lifts under the finger. */
+.policy-card.card-pick {
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease;
+}
+.policy-card.card-pick:hover:not(:disabled),
+.policy-card.card-pick:focus-visible {
+  transform: translateY(-0.35rem);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.3),
+    var(--shadow-lift),
+    0 0 0 2px var(--focus);
+}
+.policy-card.card-pick:active:not(:disabled) {
+  transform: translateY(-0.1rem);
+}
+.policy-card.slot {
+  /* Sits in a card-wide slot: full slot height, 5:7 face, never clipped. */
+  width: auto;
+  height: 100%;
+  min-width: 0;
+  max-width: none;
+  gap: 0.1rem;
+  padding: 0.25rem;
+  border-radius: 4px;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    0 1px 2px rgb(0 0 0 / 0.3);
+}
+.policy-card.slot::after {
+  inset: 0.3rem;
 }
 .role-card {
   perspective: 60rem;
@@ -457,51 +610,6 @@ textarea {
 .reveal-card-col {
   width: 100%;
 }
-.track-space {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 3.55rem;
-  border-radius: 0.42rem;
-  border: 1px solid color-mix(in srgb, var(--line) 80%, transparent);
-  background: color-mix(in srgb, var(--surface) 70%, transparent);
-  box-shadow: inset 0 2px 6px rgb(0 0 0 / 0.25);
-  color: var(--ink-muted);
-}
-.track-space.enacted {
-  border-color: color-mix(in srgb, var(--gold) 50%, var(--line));
-  box-shadow:
-    inset 0 2px 6px rgb(0 0 0 / 0.2),
-    0 0 0 2px color-mix(in srgb, var(--gold) 25%, transparent);
-}
-.track-space.interactive {
-  cursor: pointer;
-}
-.token {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.35rem;
-  padding: 0.2rem 0.5rem;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 800;
-  border: 1px solid currentColor;
-}
-.marker-president {
-  color: var(--gold);
-}
-.marker-chancellor {
-  color: var(--green);
-}
-.marker-nominee {
-  color: var(--blue);
-}
-.marker-dead {
-  color: var(--danger);
-}
-
 /* ---------- dialog ---------- */
 dialog.app-dialog {
   padding: 0;
@@ -540,17 +648,10 @@ dialog.app-dialog[open] .dialog-card {
   z-index: 100;
   display: grid;
   place-items: center;
-  background: var(--bg);
+  background-color: var(--table);
+  background-image: var(--table-texture);
   padding: 2rem;
   text-align: center;
-}
-.rotate-hint {
-  display: none;
-}
-@media (orientation: portrait) and (max-width: 900px) {
-  .game-layout .rotate-hint {
-    display: flex;
-  }
 }
 .sr-only {
   position: absolute;
@@ -562,17 +663,6 @@ dialog.app-dialog[open] .dialog-card {
   clip: rect(0, 0, 0, 0);
   white-space: nowrap;
   border: 0;
-}
-.scroll-x {
-  overflow-x: auto;
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
-}
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  scrollbar-width: none;
 }
 
 [dir='rtl'] .flip-rtl {
@@ -621,85 +711,409 @@ dialog.app-dialog[open] .dialog-card {
   }
 }
 
-/* board compact scaling */
-.game-layout .board-surface {
-  zoom: var(--board-scale, 1);
-}
 
-/* Phones held sideways have little vertical room: compress the chrome so the
-   board and action panel share one screen without clipping (AC-37). */
-@media (orientation: landscape) and (max-height: 560px) {
-  .game-layout {
-    padding-top: 0.2rem;
-    padding-bottom: 0.2rem;
-  }
-  .game-layout header .eyebrow {
-    display: none;
-  }
-  .game-layout .game-grid {
-    margin-top: 0.35rem;
-    gap: 0.4rem;
-  }
-  .game-layout .board-surface {
-    padding: 0.35rem;
-  }
-  .game-layout .board-tracks {
-    gap: 0.25rem;
-  }
-  .game-layout .board-tracks .panel {
-    padding: 0.3rem;
-  }
-  .game-layout .board-tracks header {
-    margin-bottom: 0.15rem;
-  }
-  /* The track header count duplicates the marked spaces and forces the title
-     to wrap at this width. */
-  .game-layout .board-tracks header > span:last-child {
-    display: none;
-  }
-  .game-layout .track-space {
-    height: 3rem !important;
-  }
-  .game-layout .gov-panel {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.25rem 0.5rem;
-    padding: 0.35rem;
-  }
-  .game-layout .gov-panel .eyebrow {
-    font-size: 0.58rem;
-    letter-spacing: 0.06em;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  .game-layout .gov-panel .gov-tracker .uppercase {
-    font-size: 0.58rem;
-    letter-spacing: 0.04em;
-    white-space: nowrap;
-  }
-  /* Round, phase and enacted counts are already in the header and track
-     headers; dropping the duplicate chip row buys the vertical space. */
-  .game-layout .gov-chips {
-    display: none;
-  }
-  .game-layout .player-strip ul {
-    padding-bottom: 0;
-  }
-  .game-layout .game-actions {
-    gap: 0.5rem;
-  }
+.policy-slot {
+  max-width: 3.25rem;
+  height: 3.25rem;
+  align-items: center;
+  overflow: hidden;
+  padding: 0;
 }
-
-.board-tracks {
+.deck-stack {
+  position: relative;
+  width: 2.1rem;
+  height: 2.95rem;
+}
+.deck-mini {
+  position: absolute;
+  inset: 0;
+  border-radius: 3px;
+  border: 1px solid color-mix(in srgb, var(--brass-2) 70%, #000);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.3);
+}
+.deck-mini-back {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(circle at 50% 40%, color-mix(in srgb, var(--brass) 22%, transparent), transparent 65%),
+    var(--paper-texture);
+}
+.deck-mini-discard {
+  background-color: var(--paper);
+  background-image: var(--paper-texture);
+}
+.tracker-rail {
+  --hole: 0.7rem;
+  --hole-gap: 0.3rem;
+  --rail-pad: 0.4rem;
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: var(--hole-gap);
+  padding: 0.2rem var(--rail-pad);
+  border: 1px solid color-mix(in srgb, var(--brass-2) 80%, #000);
+  border-radius: 999px;
+  background-image: linear-gradient(180deg, var(--brass), var(--brass-2));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.2);
+}
+.tracker-hole {
   display: grid;
-  grid-template-columns: 1fr;
+  place-items: center;
+  width: var(--hole);
+  height: var(--hole);
+  border-radius: 999px;
+  background-color: var(--table-2);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.7);
+}
+.tracker-pawn {
+  position: absolute;
+  top: 50%;
+  /* Centred on hole 0–3: pad + half a hole + n × (hole + gap). */
+  inset-inline-start: calc(
+    var(--rail-pad) + var(--hole) / 2 + var(--pos, 0) * (var(--hole) + var(--hole-gap))
+  );
+  width: 0.8rem;
+  height: 0.8rem;
+  border: 1px solid rgb(0 0 0 / 0.45);
+  border-radius: 999px;
+  background: radial-gradient(circle at 34% 28%, #fff9e8, var(--paper) 62%, var(--board-2));
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.5);
+  /* Logical margin, so centring mirrors with the rail in RTL. */
+  margin-inline-start: -0.4rem;
+  transform: translateY(-50%);
+  transition: inset-inline-start 200ms ease;
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .policy-slot {
+    max-width: 2.75rem;
+    height: 2.75rem;
+  }
+  .deck-stack {
+    width: 1.8rem;
+    height: 2.5rem;
+  }
+  .tracker-rail {
+    --rail-pad: 0.3rem;
+    padding: 0.1rem var(--rail-pad);
+  }
+}
+
+
+/* ---------- game table layout ----------
+   One screen: board + seats + action tray in portrait, board beside the rail
+   in landscape. The tray is part of the flow (no fixed overlay) so nothing is
+   hidden behind it. */
+.game-shell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-height: 100dvh;
+  width: 100%;
+  max-width: 72rem;
+  margin-inline: auto;
+  padding: max(0.5rem, env(safe-area-inset-top)) max(0.5rem, env(safe-area-inset-right))
+    max(0.5rem, env(safe-area-inset-bottom)) max(0.5rem, env(safe-area-inset-left));
+}
+.game-head {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+}
+/* At 200% text the three buttons eat the title line: let the title wrap under. */
+.game-head {
+  flex-wrap: wrap;
+  row-gap: 0.25rem;
+}
+.game-head > div:first-child {
+  flex: 1 1 8rem;
+}
+.game-main {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
   gap: 0.5rem;
 }
-@media (orientation: landscape) and (min-width: 560px) {
+.game-rail {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.game-tray {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.5rem 0.6rem;
+  border: 1px solid color-mix(in srgb, var(--table-2) 55%, #000);
+  border-radius: 0.6rem;
+  background-color: color-mix(in srgb, var(--table) 86%, #000);
+  background-image: var(--grain-texture);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    inset 0 -6px 14px rgb(0 0 0 / 0.28),
+    var(--shadow-sm);
+  color: var(--ink);
+}
+.game-tray .btn {
+  min-height: 3rem;
+}
+/* The tray darkens the table, so the token muted ink no longer clears AA. */
+.game-tray .text-muted {
+  color: color-mix(in srgb, var(--ink) 80%, var(--table) 20%);
+}
+.game-rail {
+  margin-top: auto;
+}
+.seat-grid {
+  display: grid;
+  /* Four seats a row on a phone; a landscape tablet has the width for more. */
+  grid-template-columns: repeat(var(--seat-cols, 4), minmax(0, 1fr));
+  gap: 0.25rem;
+  min-width: 0;
+}
+@media (min-width: 600px) {
+  .seat-grid {
+    --seat-cols: 8;
+  }
+}
+.seat-grid > li {
+  display: flex;
+  min-width: 0;
+}
+.track-row {
+  display: flex;
+  justify-content: center;
+  gap: 0;
+}
+.track-row > li {
+  flex: 0 1 3.25rem;
+  min-width: 0;
+}
+.track-row .policy-slot {
+  max-width: none;
+}
+@media (orientation: landscape) and (min-width: 640px) {
+  .game-main {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 19rem;
+    align-items: start;
+  }
+  /* Pinned to the bottom of the viewport: the action stays in thumb reach
+     even when a 13-player table makes the board scroll. */
+  .game-rail {
+    position: sticky;
+    bottom: max(0.3rem, env(safe-area-inset-bottom));
+    align-self: end;
+    margin-top: 0;
+  }
+  /* A landscape phone puts every seat on one line: 13 × 60 px at 844. */
+  .seat-grid > li {
+    flex: 1 1 3.25rem;
+  }
+}
+@media (orientation: landscape) and (max-height: 560px) {
+  .game-shell {
+    gap: 0.3rem;
+    padding-top: max(0.3rem, env(safe-area-inset-top));
+    padding-bottom: max(0.3rem, env(safe-area-inset-bottom));
+  }
+  .game-head {
+    min-height: 2rem;
+  }
+  /* Two header lines cost 20 px of board; the phase name carries the screen. */
+  .game-head .eyebrow {
+    display: none;
+  }
+  .game-head h1 {
+    font-size: 1rem;
+  }
+  .game-main {
+    gap: 0.3rem;
+  }
+  .board {
+    padding: 0.25rem;
+  }
+  .game-tray {
+    padding: 0.35rem 0.5rem;
+  }
+  .game-tray .btn {
+    min-height: 2.75rem;
+  }
+}
+@media (orientation: landscape) and (max-height: 400px) {
+  .game-shell {
+    gap: 0.2rem;
+    padding-block: 0.2rem;
+  }
+  .game-main {
+    gap: 0.2rem;
+  }
+  .board {
+    padding: 0.2rem;
+  }
+  /* The wordmark row is the cheapest 22 px; the round already sits in h1. */
+  .board > header {
+    display: none;
+  }
+}
+@media (max-width: 380px) and (orientation: portrait) {
+  .track-row > li {
+    flex-basis: 3rem;
+  }
+  /* Four seats per row cost a whole extra row; buy it back from the chrome. */
+  .policy-slot {
+    height: 2.75rem;
+  }
+  .board {
+    padding: 0.3rem;
+  }
   .board-tracks {
-    grid-template-columns: 1fr 1fr;
+    gap: 0.15rem;
   }
-  .board-tracks.board-tracks-expansion {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+  .seat-grid {
+    gap: 0.18rem;
   }
+  .game-main {
+    gap: 0.25rem;
+  }
+  .game-shell {
+    padding-block: max(0.35rem, env(safe-area-inset-top)) max(0.3rem, env(safe-area-inset-bottom));
+  }
+}
+
+/* ---------- materials: physical objects
+   Each object paints its own stock and ink so a screen only picks the object;
+   sizing and layout stay with the component. Text colour is part of the
+   object: use the token pair the contrast test guards. */
+.board {
+  min-width: 0;
+  border: 1px solid var(--board-edge);
+  border-radius: var(--radius-card);
+  background-color: var(--board);
+  background-image: var(--paper-texture);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--board-edge) 45%, transparent),
+    var(--shadow-card),
+    0 14px 26px rgb(60 45 20 / 0.25);
+  color: var(--ink-on-paper);
+}
+
+/* The board's own control: a 44 px brass tab on the piles row. */
+.board-btn {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--board-edge) 65%, transparent);
+  background-color: var(--paper);
+  color: var(--brass);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.5);
+  cursor: pointer;
+}
+.board-btn:hover {
+  background-color: var(--board-2);
+}
+.board-slot {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  border: 1px solid color-mix(in srgb, var(--board-edge) 80%, #000);
+  border-radius: 3px;
+  background-color: var(--board-2);
+  box-shadow:
+    inset 0 2px 3px rgb(0 0 0 / 0.22),
+    0 1px 0 rgb(255 255 255 / 0.45);
+  color: var(--ink-on-paper);
+}
+
+.paper {
+  border: 1px solid color-mix(in srgb, var(--board-edge) 55%, transparent);
+  border-radius: var(--radius-card);
+  background-color: var(--paper);
+  background-image: var(--paper-texture);
+  box-shadow: var(--shadow-card);
+  color: var(--ink-on-paper);
+}
+
+.nameplate {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  min-height: 44px;
+  padding: 0.25rem 0.4rem;
+  border: 1px solid color-mix(in srgb, var(--board-edge) 70%, transparent);
+  border-radius: 3px;
+  background-color: var(--paper);
+  background-image: var(--paper-texture);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    var(--shadow-card);
+  color: var(--ink-on-paper);
+  font-size: var(--text-label);
+  font-weight: 700;
+}
+/* A seat you cannot pick: the plate fades into the board. */
+.nameplate.is-blocked {
+  background-image: none;
+  background-color: color-mix(in srgb, var(--board-2) 82%, var(--table) 18%);
+  color: var(--paper-muted);
+  box-shadow: inset 0 1px 2px rgb(0 0 0 / 0.18);
+}
+/* The seat the president just tapped. */
+.nameplate.is-pickable {
+  border-color: color-mix(in srgb, var(--brass) 55%, transparent);
+}
+.nameplate.is-selected {
+  background-image: none;
+  background-color: var(--brass);
+  border-color: var(--brass-2);
+  color: var(--on-brass);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.28),
+    var(--shadow-card);
+}
+
+
+
+.brass-plaque {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-height: 1.75rem;
+  padding: 0.15rem 0.5rem;
+  border: 1px solid color-mix(in srgb, var(--brass-2) 70%, #000);
+  border-radius: 3px;
+  background-color: var(--brass);
+  background-image: var(--brass-texture);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.25),
+    0 1px 2px rgb(0 0 0 / 0.35);
+  color: var(--on-brass);
+  font-size: var(--text-label);
+  font-variant-numeric: tabular-nums;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.tray {
+  border: 1px solid color-mix(in srgb, var(--table-2) 60%, #000);
+  border-radius: 0.6rem;
+  background-color: color-mix(in srgb, var(--table) 88%, #000);
+  background-image: var(--grain-texture);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.08),
+    inset 0 -6px 14px rgb(0 0 0 / 0.3),
+    var(--shadow-sm);
+  color: var(--ink);
+}
+
+
+[dir='rtl'] .stamp {
+  transform: rotate(2deg);
 }

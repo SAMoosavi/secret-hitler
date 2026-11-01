@@ -110,8 +110,8 @@ async function answerVeto(accept: boolean): Promise<void> {
       {{ chancellorPhase ? t('legislative.chancellorHint', { name: chancellor }) : t('legislative.presidentHint', { name: president }) }}
     </p>
 
-    <div v-if="!revealed" class="mt-4 flex flex-col items-center gap-3 rounded-xl border border-dashed border-line bg-surface-2/50 p-4">
-      <div class="flex items-end justify-center gap-2">
+    <div v-if="!revealed" class="mt-4 flex flex-col items-center gap-3">
+      <div class="hand-fan">
         <PolicyCard v-for="n in hand.length" :key="n" size="md" />
       </div>
       <p class="text-sm font-bold">{{ t('legislative.cardsHidden') }}</p>
@@ -132,7 +132,7 @@ async function answerVeto(accept: boolean): Promise<void> {
             :disabled="busy"
             @select="choose(index)"
           />
-          <span class="text-[0.65rem] font-bold text-muted">
+          <span class="text-xs font-bold text-muted">
             {{ chancellorPhase ? t('legislative.chooseEnact') : t('legislative.chooseDiscard') }}
           </span>
         </div>
@@ -163,6 +163,6 @@ async function answerVeto(accept: boolean): Promise<void> {
       </div>
     </div>
 
-    <p class="mt-4 text-xs text-muted">{{ t('reveal.privacy') }}</p>
+    <p class="mt-4 text-xs text-muted">{{ t('legislative.privacy') }}</p>
   </AppDialog>
 </template>

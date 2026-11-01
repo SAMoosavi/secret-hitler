@@ -70,6 +70,19 @@ const readable: Array<[string, string]> = [
   ['--danger-text', '--surface'],
   ['--danger-text', '--bg'],
   ['--on-gold', '--gold'],
+  // materials
+  ['--ink-on-paper', '--board'],
+  ['--ink-on-paper', '--paper'],
+  ['--paper-muted', '--paper'],
+  ['--brass', '--board'],
+  ['--on-brass', '--brass'],
+  ['--ink', '--table'],
+  ['--ink-muted', '--table'],
+  // printed card faces (cream ink on the party colour, brass ink on the back)
+  ['--card-face-ink', '--card-liberal'],
+  ['--card-face-ink', '--card-fascist'],
+  ['--card-face-ink', '--card-communist'],
+  ['--card-back-ink', '--card-back'],
 ]
 
 describe('theme contrast', () => {
@@ -81,6 +94,8 @@ describe('theme contrast', () => {
       }
       // Danger buttons paint white on the solid token, not the text token.
       expect(ratio('#ffffff', vars['--danger']), `${name}: white on --danger`).toBeGreaterThanOrEqual(4.5)
+      // The oxblood card face paints white, as in the physical deck.
+      expect(ratio('#ffffff', vars['--oxblood']), `${name}: white on --oxblood`).toBeGreaterThanOrEqual(4.5)
     })
   }
 })

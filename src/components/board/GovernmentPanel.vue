@@ -1,84 +1,53 @@
 <script setup lang="ts">
-import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AppIcon from '../base/AppIcon.vue'
-import ElectionTracker from './ElectionTracker.vue'
-import { formatNumber } from '../../i18n/format'
-import { fascistTrackFor, liberalTrackFor } from '../../game/constants'
 import type { PublicView } from '../../game/types'
 
 const props = defineProps<{ view: PublicView }>()
-const { t, locale } = useI18n()
+const { t } = useI18n()
 
 function nameOf(id: number | null): string {
   if (id === null) return '—'
   return props.view.players.find((p) => p.id === id)?.name ?? '—'
 }
-function num(value: number): string {
-  return formatNumber(value, locale.value)
-}
-
-const electionText = computed(() => {
-  const result = props.view.lastElection
-  if (!result) return t('game.noElection')
-  const outcome = result.approved ? t('game.approved') : t('game.rejected')
-  return `${outcome}: ${nameOf(result.presidentId)} / ${nameOf(result.chancellorId)}`
-})
 </script>
 
 <template>
-  <section class="panel gov-panel grid grid-cols-2 gap-x-3 gap-y-2 p-2.5" :aria-label="t('game.title')">
-    <div class="min-w-0">
-      <p class="eyebrow flex items-center gap-1">
-        <AppIcon name="crown" :size="12" />
-        {{ t('game.president') }}
-      </p>
-      <p class="truncate text-sm font-bold">{{ nameOf(view.presidentId) }}</p>
-    </div>
-    <div class="min-w-0">
-      <p class="eyebrow flex items-center gap-1">
-        <AppIcon name="shield" :size="12" />
-        {{ t('game.chancellor') }}
-      </p>
-      <p class="truncate text-sm font-bold">{{ nameOf(view.lastChancellorId) }}</p>
-    </div>
-    <div class="min-w-0">
-      <p class="eyebrow flex items-center gap-1">
-        <AppIcon name="ballot" :size="12" />
-        {{ t('game.nominee') }}
-      </p>
-      <p class="truncate text-sm font-bold">
-        {{ view.nomineeId === null ? t('game.noNominee') : nameOf(view.nomineeId) }}
-      </p>
-    </div>
-    <div class="gov-last-election min-w-0">
-      <p class="eyebrow">{{ t('game.lastElection') }}</p>
-      <p class="truncate text-[0.72rem] font-semibold text-muted">{{ electionText }}</p>
-    </div>
-    <div class="gov-tracker col-span-2 flex items-center justify-between gap-2 border-t border-line pt-2">
-      <ElectionTracker :value="view.tracker" :veto-unlocked="view.vetoUnlocked" />
-      <div class="flex items-center gap-2 text-[0.68rem] font-bold text-muted">
-        <span class="chip !py-0.5" :title="t('a11y.deckCount', { n: num(view.deckCount) })">
-          <AppIcon name="cards" :size="12" />
-          {{ num(view.deckCount) }}
+  <section class="min-w-0" :aria-label="t('game.title')">
+    <div class="grid grid-cols-[repeat(auto-fit,minmax(5.5rem,1fr))] gap-1">
+      <div class="nameplate !flex-col !items-stretch !gap-0 !px-1.5 !py-0.5">
+        <span
+          class="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-paper-muted"
+        >
+          <AppIcon name="crown" :size="11" class="text-brass" />
+          {{ t('game.president') }}
         </span>
-        <span class="chip !py-0.5" :title="t('a11y.discardCount', { n: num(view.discardCount) })">
-          <AppIcon name="trash" :size="12" />
-          {{ num(view.discardCount) }}
+        <span class="w-full truncate text-base font-bold leading-tight text-ink-on-paper">
+          {{ nameOf(view.presidentId) }}
         </span>
       </div>
-    </div>
-    <div class="gov-chips col-span-2 flex flex-wrap items-center gap-2 text-[0.68rem] text-muted">
-      <span class="chip !py-0.5">{{ t('game.round', { n: num(view.round) }) }}</span>
-      <span class="chip !py-0.5">{{ t(`phases.${view.phase}`) }}</span>
-      <span class="chip !py-0.5">
-        <AppIcon name="sun" :size="11" class="text-liberal" />
-        {{ num(view.enactedLiberal) }}/{{ num(liberalTrackFor(view.playerCount)) }}
-      </span>
-      <span class="chip !py-0.5">
-        <AppIcon name="crest" :size="11" class="text-fascist" />
-        {{ num(view.enactedFascist) }}/{{ num(fascistTrackFor(view.playerCount)) }}
-      </span>
+      <div class="nameplate !flex-col !items-stretch !gap-0 !px-1.5 !py-0.5">
+        <span
+          class="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-paper-muted"
+        >
+          <AppIcon name="shield" :size="11" class="text-[var(--green)]" />
+          {{ t('game.chancellor') }}
+        </span>
+        <span class="w-full truncate text-base font-bold leading-tight text-ink-on-paper">
+          {{ nameOf(view.lastChancellorId) }}
+        </span>
+      </div>
+      <div class="nameplate !flex-col !items-stretch !gap-0 !px-1.5 !py-0.5">
+        <span
+          class="flex items-center gap-1 text-xs font-bold uppercase tracking-wide text-paper-muted"
+        >
+          <AppIcon name="ballot" :size="11" class="text-liberal" />
+          {{ t('game.nomineeShort') }}
+        </span>
+        <span class="w-full truncate text-base font-bold leading-tight text-ink-on-paper">
+          {{ view.nomineeId === null ? '—' : nameOf(view.nomineeId) }}
+        </span>
+      </div>
     </div>
   </section>
 </template>
