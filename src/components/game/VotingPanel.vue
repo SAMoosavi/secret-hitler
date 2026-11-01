@@ -20,13 +20,13 @@ async function submit(approved: boolean): Promise<void> {
 </script>
 
 <template>
-  <section class="panel p-3">
-    <h2 class="text-lg font-bold">{{ t('voting.title') }}</h2>
-    <p class="mt-0.5 text-xs text-muted">{{ t('voting.hint') }}</p>
-    <div class="mt-3 grid grid-cols-2 gap-2">
+  <section class="game-tray">
+    <h2 class="text-base font-bold">{{ t('voting.title') }}</h2>
+    <p class="text-xs text-muted">{{ t('voting.hint') }}</p>
+    <div class="mt-1.5 grid grid-cols-2 gap-2">
       <button
         type="button"
-        class="btn btn-primary min-h-16 flex-col !gap-1"
+        class="btn btn-primary min-h-14 flex-col !gap-1"
         :disabled="busy"
         @click="submit(true)"
       >
@@ -35,7 +35,7 @@ async function submit(approved: boolean): Promise<void> {
       </button>
       <button
         type="button"
-        class="btn btn-danger min-h-16 flex-col !gap-1"
+        class="btn btn-danger min-h-14 flex-col !gap-1"
         :disabled="busy"
         @click="submit(false)"
       >
@@ -43,6 +43,6 @@ async function submit(approved: boolean): Promise<void> {
         <span class="text-sm">{{ t('voting.reject') }}</span>
       </button>
     </div>
-    <p class="mt-2 text-center text-[0.65rem] text-muted">{{ t('voting.note') }}</p>
+    <p class="text-center text-xs text-muted">{{ t('voting.note') }}</p>
   </section>
 </template>

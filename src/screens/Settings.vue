@@ -10,7 +10,7 @@ import { useGameStore } from '../stores/game'
 import { useSettingsStore, type Settings as SettingsValues } from '../stores/settings'
 import { formatNumber } from '../i18n/format'
 
-type BooleanKey = 'sound' | 'haptics' | 'animations' | 'privacy' | 'confirmReversible' | 'autoResume'
+type BooleanKey = 'sound' | 'haptics' | 'animations' | 'confirmReversible' | 'autoResume'
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -25,7 +25,6 @@ const rows = computed<Array<{ key: BooleanKey; icon: IconName; label: string; hi
   { key: 'sound', icon: 'volume', label: t('settings.sound'), hint: '' },
   { key: 'haptics', icon: 'vibrate', label: t('settings.haptics'), hint: '' },
   { key: 'animations', icon: 'sparkles', label: t('settings.animations'), hint: '' },
-  { key: 'privacy', icon: 'lock', label: t('settings.privacy'), hint: t('settings.privacyHint') },
   {
     key: 'confirmReversible',
     icon: 'shield',
@@ -227,7 +226,7 @@ async function clearSave(): Promise<void> {
         <AppIcon name="book" :size="18" />
         {{ t('settings.about') }}
       </button>
-      <p class="mt-2 text-center text-[0.68rem] text-muted">
+      <p class="mt-2 text-center text-xs text-muted">
         {{ t('settings.version', { version }) }}
       </p>
     </section>

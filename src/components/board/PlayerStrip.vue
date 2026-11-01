@@ -25,9 +25,9 @@ function eligibility(id: number): Eligibility {
 </script>
 
 <template>
-  <section class="player-strip" :aria-label="t('a11y.players')">
-    <ul class="scroll-x no-scrollbar flex gap-1.5 pb-1">
-      <li v-for="player in players" :key="player.id" class="shrink-0">
+  <section class="min-w-0" :aria-label="t('a11y.players')">
+    <ul class="seat-grid">
+      <li v-for="player in players" :key="player.id" class="min-w-0">
         <PlayerToken
           :player="player"
           :president="player.id === presidentId"

@@ -146,9 +146,9 @@ test('the four-player house variant runs on the short tracks', async ({ page }) 
   await expect(
     page.getByRole('region', { name: 'Fascist policies' }).locator('.track-space'),
   ).toHaveCount(5)
-  // The government chips must quote the same maxima as the tracks.
-  await expect(page.getByText('0/4', { exact: true })).toBeVisible()
-  await expect(page.getByText('0/5', { exact: true })).toBeVisible()
+  // The track headers must quote the same maxima as the tracks.
+  await expect(page.getByText(/^0\s*\/\s*4$/)).toBeVisible()
+  await expect(page.getByText(/^0\s*\/\s*5$/)).toBeVisible()
 })
 
 test('a newer save is refused without touching the game', async ({ page }) => {

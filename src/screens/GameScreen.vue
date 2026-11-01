@@ -135,14 +135,14 @@ function showBoard(): void {
 </script>
 
 <template>
-  <div v-if="state && view" class="page page-wide game-layout min-h-dvh safe-x safe-top">
-    <header class="flex items-center gap-2">
+  <div v-if="state && view" class="game-shell">
+    <header class="game-head">
       <div class="min-w-0 flex-1">
         <p class="eyebrow flex items-center gap-1.5">
           <AppIcon name="crest" :size="12" />
           {{ t('game.title') }}
         </p>
-        <h1 class="truncate text-xl font-bold">
+        <h1 class="truncate text-lg font-bold leading-tight">
           {{ t('game.round', { n: num(state.round) }) }}
           <span class="text-sm font-semibold text-muted">· {{ t(`phases.${view.phase}`) }}</span>
         </h1>
@@ -160,17 +160,9 @@ function showBoard(): void {
 
     <p class="sr-only" role="status" aria-live="polite">{{ announcement }}</p>
 
-    <div class="rotate-hint mt-2 items-center gap-2 rounded-lg border border-gold/40 bg-gold/10 p-2 text-xs">
-      <AppIcon name="rotate" :size="18" class="shrink-0 text-gold" />
-      <div>
-        <p class="font-bold">{{ t('game.rotate') }}</p>
-        <p class="text-muted">{{ t('game.rotateHint') }}</p>
-      </div>
-    </div>
-
     <p
       v-if="game.lastError"
-      class="mt-2 flex items-center gap-2 rounded-lg border border-danger/50 bg-surface p-2 text-sm font-semibold"
+      class="flex items-center gap-2 rounded-lg border border-danger/50 bg-surface p-2 text-sm font-semibold"
       role="alert"
     >
       <AppIcon name="x" :size="16" class="shrink-0 text-danger" />
@@ -180,7 +172,7 @@ function showBoard(): void {
       </button>
     </p>
 
-    <div class="game-grid mt-3 grid gap-3 landscape:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)] lg:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+    <div class="game-main">
       <GameBoard
         :view="view"
         :eligibilities="list"
@@ -189,23 +181,23 @@ function showBoard(): void {
         @select="selectedId = $event"
       />
 
-      <div class="flex flex-col gap-3 game-actions">
-        <section v-if="view.phase === 'nomination'" class="panel p-3">
-          <h2 class="text-lg font-bold">{{ t('nomination.title') }}</h2>
-          <p class="mt-0.5 text-xs text-muted">{{ t('nomination.hint') }}</p>
+      <div class="game-rail">
+        <section v-if="view.phase === 'nomination'" class="game-tray">
+          <h2 class="text-base font-bold">{{ t('nomination.title') }}</h2>
+          <p class="text-xs text-muted">{{ t('nomination.hint') }}</p>
           <p
             v-if="selected"
-            class="mt-3 rounded-lg border border-gold/40 bg-gold/10 p-2 text-sm font-bold"
+            class="mt-1 rounded-md border border-gold/40 bg-gold/10 p-1.5 text-sm font-bold"
           >
             {{ t('nomination.choose', { name: selected.name }) }}
           </p>
-          <p v-else class="mt-3 text-sm text-muted">{{ t('game.noNominee') }}</p>
-          <p v-if="list.every((entry) => !entry.eligible)" class="mt-2 text-sm text-danger">
+          <p v-else class="mt-1 text-sm text-muted">{{ t('game.noNominee') }}</p>
+          <p v-if="list.every((entry) => !entry.eligible)" class="mt-1 text-sm text-danger">
             {{ t('nomination.none') }}
           </p>
           <button
             type="button"
-            class="btn btn-primary mt-3 w-full"
+            class="btn btn-primary mt-1 w-full"
             :disabled="!selected || !selectedEligible || game.busy"
             @click="nominate"
           >
@@ -220,10 +212,10 @@ function showBoard(): void {
           @vote="act({ type: 'vote', approved: $event })"
         />
 
-        <section v-else-if="view.phase !== 'gameOver'" class="panel p-3">
+        <section v-else-if="view.phase !== 'gameOver'" class="game-tray">
           <p class="eyebrow">{{ t('game.phase') }}</p>
-          <p class="mt-1 text-lg font-bold">{{ t(`phases.${view.phase}`) }}</p>
-          <p v-if="view.phase !== 'radicalisationReveal'" class="mt-1 text-xs text-muted">
+          <p class="mt-0.5 text-base font-bold">{{ t(`phases.${view.phase}`) }}</p>
+          <p v-if="view.phase !== 'radicalisationReveal'" class="mt-0.5 text-xs text-muted">
             {{
               view.phase === 'executive' || view.phase === 'communistPower'
                 ? t('game.powerInfo')
@@ -231,10 +223,6 @@ function showBoard(): void {
             }}
           </p>
         </section>
-
-        <p class="text-[0.65rem] text-muted">
-          {{ t('voting.note') }}
-        </p>
       </div>
     </div>
 

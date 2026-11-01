@@ -168,11 +168,11 @@ onBeforeRouteLeave(async () => {
       </div>
     </header>
 
-    <ol class="mt-3 flex gap-1" :aria-label="t('setup.title')">
+    <ol class="mt-3 flex gap-2" :aria-label="t('setup.title')">
       <li
         v-for="(label, index) in steps"
         :key="label"
-        class="flex-1 border-t-2 pt-1 text-[0.6rem] font-bold uppercase tracking-wide"
+        class="flex-1 border-t-2 pt-1 pe-1 text-xs font-bold uppercase tracking-normal"
         :class="index <= step ? 'border-gold text-gold' : 'border-line text-muted'"
       >
         <span class="line-clamp-2">{{ label }}</span>
@@ -188,8 +188,8 @@ onBeforeRouteLeave(async () => {
             v-for="n in playerCounts"
             :key="n"
             type="button"
-            class="panel relative flex min-h-20 flex-col items-center justify-center gap-0.5"
-            :class="count === n ? '!border-gold ring-2 ring-gold/40' : ''"
+            class="nameplate relative !min-h-20 !flex-col !justify-center !gap-0.5 !px-2 !py-2"
+            :class="count === n ? 'is-selected' : ''"
             :aria-pressed="count === n"
             :aria-label="
               isExpansion(n)
@@ -204,16 +204,16 @@ onBeforeRouteLeave(async () => {
               v-if="isExpansion(n)"
               name="sparkles"
               :size="12"
-              class="absolute end-1.5 top-1.5 text-gold"
+              class="absolute end-1.5 top-1.5"
             />
             <AppIcon
               v-else-if="isSmallTable(n)"
               name="user"
               :size="12"
-              class="absolute end-1.5 top-1.5 text-gold"
+              class="absolute end-1.5 top-1.5"
             />
             <span class="text-2xl font-bold">{{ num(n) }}</span>
-            <span class="text-[0.65rem] text-muted">{{ t('common.players') }}</span>
+            <span class="text-xs">{{ t('common.players') }}</span>
           </button>
         </div>
         <p v-if="expansion" class="mt-2 chip">{{ t('setup.expansionChip') }}</p>
@@ -300,19 +300,19 @@ onBeforeRouteLeave(async () => {
           <p class="panel mt-4 p-3 text-sm font-bold">{{ t('setup.deckCommunist') }}</p>
           <dl class="mt-2 grid grid-cols-2 gap-2">
             <div class="panel p-3">
-              <dt class="text-[0.68rem] font-bold uppercase text-muted">{{ t('setup.liberalTiles') }}</dt>
+              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.liberalTiles') }}</dt>
               <dd class="text-2xl font-bold">{{ num(recipe.liberal) }}</dd>
             </div>
             <div class="panel p-3">
-              <dt class="text-[0.68rem] font-bold uppercase text-muted">{{ t('setup.fascistTiles') }}</dt>
+              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.fascistTiles') }}</dt>
               <dd class="text-2xl font-bold">{{ num(recipe.fascist) }}</dd>
             </div>
             <div class="panel p-3">
-              <dt class="text-[0.68rem] font-bold uppercase text-muted">{{ t('setup.deckTiles') }}</dt>
+              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.deckTiles') }}</dt>
               <dd class="text-2xl font-bold">{{ num(deckTotal) }}</dd>
             </div>
             <div class="panel p-3">
-              <dt class="text-[0.68rem] font-bold uppercase text-muted">{{ t('setup.handTiles') }}</dt>
+              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.handTiles') }}</dt>
               <dd class="text-2xl font-bold">{{ num(HAND_SIZE) }}</dd>
             </div>
           </dl>
@@ -331,7 +331,7 @@ onBeforeRouteLeave(async () => {
               </dt>
               <dd class="text-end">
                 <span class="block text-xl font-bold">{{ num(fascistTrack) }}</span>
-                <span class="block text-[0.65rem] text-muted">{{ t('setup.fascistBoard910') }}</span>
+                <span class="block text-xs text-muted">{{ t('setup.fascistBoard910') }}</span>
               </dd>
             </div>
             <div class="panel flex items-center justify-between gap-3 p-3">
@@ -341,7 +341,7 @@ onBeforeRouteLeave(async () => {
               </dt>
               <dd class="text-end">
                 <span class="block text-xl font-bold">{{ num(COMMUNIST_TRACK) }}</span>
-                <span class="block text-[0.65rem] text-muted">{{ t('setup.trackCommunistWin') }}</span>
+                <span class="block text-xs text-muted">{{ t('setup.trackCommunistWin') }}</span>
               </dd>
             </div>
           </dl>
@@ -349,7 +349,7 @@ onBeforeRouteLeave(async () => {
             <li
               v-for="(space, index) in communistPowers"
               :key="index"
-              class="flex min-h-12 items-center gap-1.5 rounded-lg border border-line bg-surface-2/60 p-2 text-[0.68rem] font-bold"
+              class="flex min-h-12 items-center gap-1.5 rounded-lg border border-line bg-surface-2/60 p-2 text-xs font-bold"
             >
               <AppIcon :name="space.icon" :size="16" class="shrink-0 text-[var(--green)]" />
               <span class="text-muted">{{ num(index + 1) }}</span>
@@ -363,19 +363,19 @@ onBeforeRouteLeave(async () => {
         <template v-else>
           <dl class="mt-4 grid grid-cols-2 gap-2">
             <div class="panel p-3">
-              <dt class="text-[0.68rem] font-bold uppercase text-muted">{{ t('setup.liberalTiles') }}</dt>
+              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.liberalTiles') }}</dt>
               <dd class="text-2xl font-bold">{{ num(recipe.liberal) }}</dd>
             </div>
             <div class="panel p-3">
-              <dt class="text-[0.68rem] font-bold uppercase text-muted">{{ t('setup.fascistTiles') }}</dt>
+              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.fascistTiles') }}</dt>
               <dd class="text-2xl font-bold">{{ num(recipe.fascist) }}</dd>
             </div>
             <div class="panel p-3">
-              <dt class="text-[0.68rem] font-bold uppercase text-muted">{{ t('setup.deckTiles') }}</dt>
+              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.deckTiles') }}</dt>
               <dd class="text-2xl font-bold">{{ num(deckTotal) }}</dd>
             </div>
             <div class="panel p-3">
-              <dt class="text-[0.68rem] font-bold uppercase text-muted">{{ t('setup.handTiles') }}</dt>
+              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.handTiles') }}</dt>
               <dd class="text-2xl font-bold">{{ num(HAND_SIZE) }}</dd>
             </div>
           </dl>

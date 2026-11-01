@@ -107,11 +107,11 @@ function cycleTheme(): void {
           <AppIcon name="chevron" :size="20" />
           <span class="flex flex-col items-start">
             <span>{{ t('menu.resume') }}</span>
-            <span class="text-[0.68rem] font-semibold text-muted">{{ savedLabel }}</span>
+            <span class="text-xs font-semibold text-muted">{{ savedLabel }}</span>
           </span>
         </button>
 
-        <button type="button" class="btn btn-secondary" @click="router.push('/how-to-play')">
+        <button type="button" class="btn btn-ghost" @click="router.push('/how-to-play')">
           <AppIcon name="book" :size="18" />
           {{ t('menu.howToPlay') }}
         </button>
@@ -138,7 +138,7 @@ function cycleTheme(): void {
       </div>
     </div>
 
-    <footer class="pb-2 text-center text-[0.68rem] text-muted">
+    <footer class="pb-2 text-center text-xs text-muted">
       <p>{{ t('menu.footer') }}</p>
       <p class="mt-1">{{ t('settings.version', { version }) }}</p>
     </footer>

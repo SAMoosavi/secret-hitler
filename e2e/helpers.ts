@@ -94,7 +94,9 @@ export async function confirmWith(page: Page, button: string | RegExp): Promise<
 
 /** Nominates the first eligible player and records an approved vote. */
 export async function electGovernment(page: Page): Promise<void> {
-  const eligible = page.getByRole('button').filter({ hasText: 'Eligible' }).first()
+  // Seats are nameplates now: picking is shown by colour, and a seat that
+  // cannot be picked carries aria-disabled.
+  const eligible = page.locator('button.nameplate:not([aria-disabled="true"])').first()
   await eligible.click()
   await expect(page.getByText(/^Choose /)).toBeVisible()
   await page.getByRole('button', { name: 'Nominate', exact: true }).click()

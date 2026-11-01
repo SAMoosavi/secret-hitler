@@ -9,33 +9,23 @@ const num = (value: number): string => formatNumber(value, locale.value)
 </script>
 
 <template>
-  <div>
-    <div class="mb-1 flex items-center justify-between gap-2">
-      <span class="text-[0.68rem] font-bold uppercase tracking-wider text-muted">
-        {{ t('game.tracker') }}
+  <div class="flex min-w-0 items-center gap-1.5">
+    <span class="hidden text-xs font-bold uppercase tracking-wider text-paper-muted sm:inline">
+      {{ t('game.tracker') }}
+    </span>
+    <div
+      class="tracker-rail"
+      role="img"
+      :aria-label="`${t('game.tracker')}: ${num(value)}/3`"
+      :style="{ '--pos': value }"
+    >
+      <span v-for="n in 3" :key="n" class="tracker-hole">
+        <AppIcon v-if="n <= value" name="x" :size="9" class="text-oxblood" />
       </span>
-      <span
-        v-if="vetoUnlocked"
-        class="chip !border-gold/50 !text-gold !py-0 !text-[0.6rem]"
-      >
-        <AppIcon name="scale" :size="11" />
-        {{ t('game.vetoUnlocked') }}
-      </span>
+      <span class="tracker-pawn" aria-hidden="true" />
     </div>
-    <div class="flex items-center gap-1.5" role="img" :aria-label="`${t('game.tracker')}: ${num(value)}/3`">
-      <span
-        v-for="n in 3"
-        :key="n"
-        class="flex h-7 w-8 items-center justify-center rounded-md border text-[0.65rem] font-extrabold"
-        :class="
-          n <= value
-            ? 'border-gold bg-gold/20 text-gold'
-            : 'border-line bg-surface/60 text-muted'
-        "
-      >
-        <AppIcon v-if="n <= value" name="x" :size="13" />
-        <template v-else>{{ num(n) }}</template>
-      </span>
-    </div>
+    <span v-if="vetoUnlocked" class="brass-plaque min-h-0 px-1.5 py-0 text-xs">
+      {{ t('game.vetoUnlocked') }}
+    </span>
   </div>
 </template>

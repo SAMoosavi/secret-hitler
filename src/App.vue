@@ -1,10 +1,9 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, watch, watchEffect } from 'vue'
+import { onMounted, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import AppIcon from './components/base/AppIcon.vue'
 import ConfirmDialog from './components/base/ConfirmDialog.vue'
-import { installPrivacyCover } from './platform/privacy'
 import { useGameStore } from './stores/game'
 import { useSettingsStore } from './stores/settings'
 
@@ -12,17 +11,6 @@ const { t } = useI18n()
 const router = useRouter()
 const settings = useSettingsStore()
 const game = useGameStore()
-
-const covered = ref(false)
-let stopPrivacy: (() => void) | null = null
-
-function watchPrivacy(enabled: boolean): void {
-  stopPrivacy?.()
-  stopPrivacy = null
-  if (enabled) stopPrivacy = installPrivacyCover(() => (covered.value = true))
-}
-
-watch(() => settings.settings.privacy, watchPrivacy, { immediate: true })
 
 watchEffect(() => {
   document.title = `${t('appTitle')} · ${t('appSubtitle')}`
@@ -33,10 +21,6 @@ onMounted(async () => {
   if (router.currentRoute.value.path !== '/') return
   if (!settings.settings.autoResume || !game.state) return
   await router.replace(game.state.phase === 'roleReveal' ? '/reveal' : '/game')
-})
-
-onBeforeUnmount(() => {
-  stopPrivacy?.()
 })
 </script>
 
@@ -65,17 +49,4 @@ onBeforeUnmount(() => {
   </div>
 
   <ConfirmDialog />
-
-  <div v-if="covered" class="privacy-cover">
-    <div class="flex flex-col items-center gap-4">
-      <span class="flex h-16 w-16 items-center justify-center rounded-full border border-line bg-surface">
-        <AppIcon name="lock" :size="30" class="text-gold" />
-      </span>
-      <p class="text-lg font-bold">{{ t('privacy.covered') }}</p>
-      <button type="button" class="btn btn-primary" @click="covered = false">
-        <AppIcon name="eye" :size="18" />
-        {{ t('privacy.tap') }}
-      </button>
-    </div>
-  </div>
 </template>

@@ -104,7 +104,7 @@ async function newGame(): Promise<void> {
       </span>
       <p class="mt-1 text-sm text-muted">{{ reason }}</p>
 
-      <p v-if="!expansion" class="text-[0.7rem] text-muted">
+      <p v-if="!expansion" class="text-xs text-muted">
         {{ t('gameOver.summary', {
           round: num(state.round),
           liberal: num(state.enactedLiberal),
@@ -114,14 +114,14 @@ async function newGame(): Promise<void> {
         }) }}
       </p>
       <template v-else>
-        <p class="text-[0.7rem] text-muted">{{ t('game.round', { n: num(state.round) }) }}</p>
+        <p class="text-xs text-muted">{{ t('game.round', { n: num(state.round) }) }}</p>
         <dl class="grid w-full grid-cols-3 gap-2">
           <div
             v-for="total in totals"
             :key="total.key"
             class="flex flex-col items-center rounded-lg border border-line bg-surface-2 px-1 py-1"
           >
-            <dt class="text-[0.65rem] leading-tight text-muted">{{ t(total.key) }}</dt>
+            <dt class="text-xs leading-tight text-muted">{{ t(total.key) }}</dt>
             <dd class="text-sm font-bold">{{ num(total.value) }}/{{ num(total.max) }}</dd>
           </div>
         </dl>
@@ -130,7 +130,7 @@ async function newGame(): Promise<void> {
 
     <section v-if="expansion" class="mt-3">
       <h3 class="mb-1 text-sm font-bold">{{ t('gameOver.rolesTitle') }}</h3>
-      <ul class="max-h-[38vh] space-y-1 overflow-y-auto pe-1">
+      <ul class="max-h-[34vh] space-y-1 overflow-y-auto pe-1">
         <li
           v-for="player in state.players"
           :key="player.id"
