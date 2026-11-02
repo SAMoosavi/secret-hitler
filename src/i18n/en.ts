@@ -458,19 +458,19 @@ export default {
       'At 11–13 players a third party joins: the Communists. This is a fan-made expansion chosen by player count alone; there is no separate mode switch. Below 11 players it is off and the base 5–10 game is unchanged.',
     expansionRolesTitle: 'Roles at 11–13',
     expansionRoles:
-      '11 players: 5 liberals, 3 fascists, 2 communists and Hitler. 12: 6/3/2 and Hitler. 13: 6/3/3 and Hitler. The fascist count never includes Hitler. Communists know each other; Hitler does not know them.',
+      '11 players: 5 liberals, 3 fascists, 2 communists and Hitler.\n12 players: 6 liberals, 3 fascists, 2 communists and Hitler.\n13 players: 6 liberals, 3 fascists, 3 communists and Hitler.\n\nHitler is a fascist but is not counted in the fascist number. Communists know each other. Hitler and the fascists do not know who the communists are.',
     expansionDeckTitle: 'Deck and board',
     expansionDeck:
-      'The deck has 23 tiles: 8 communist, 5 liberal and 10 fascist. The 11–13 game uses the fascist board for 9–10 players. Five-Year Plan adds 2 communist and 1 liberal tile to the draw pile and shuffles it, for 26 tiles in play.',
+      'The deck has 23 tiles: 8 communist, 5 liberal and 10 fascist.\nCommunist policies go on their own six-space track.\nFascist policies use the 9–10 player board, which has six spaces: investigation, investigation, special election, execution, execution and the fascist victory.',
     expansionTrackTitle: 'Communist track',
     expansionTrack:
-      'The six communist spaces are blank, Radicalisation, Five-Year Plan, Radicalisation, Confession, and victory. The sixth communist policy ends the game; the spaces before it trigger their power when the policy is enacted.',
+      'The six spaces are: blank, Radicalisation, Five-Year Plan, Radicalisation, Confession, victory.\n\nWhen a communist policy lands on a space with a power, the power happens immediately. Five-Year Plan adds 2 communist and 1 liberal tile to the draw pile and shuffles it, so 26 tiles are in play.\n\nThe sixth communist policy wins the game for the Communists.',
     expansionSecretTitle: 'Radicalisation and Confession',
     expansionSecret:
-      'Radicalisation and Confession are secret pass-the-phone steps. Radicalisation converts one player to the communist party. A converted player keeps their secret role card, but their party changes permanently, and they win or lose with their current party. Confession shows the sitting president’s current party to the table.',
+      'Radicalisation: the president privately chooses one living player. Hitler cannot be converted, and a player who is already a Communist does not change. The phone then goes to every player in turn, and each player only learns whether they themselves changed. A converted player keeps their role card, but their party changes permanently: they win or lose with the Communists and are not told who the other Communists are.\n\nConfession is public: the president’s current party is shown to the whole table and recorded in the board’s confession list.',
     expansionVictoryTitle: 'Victory with the expansion',
     expansionVictory:
-      'Six communist policies win for the Communists only. Executing Hitler at 11–13 is a joint liberal and communist win. All other endings are unchanged: five liberal policies, six fascist policies, or Hitler elected chancellor after three fascist policies.',
+      'Six communist policies: only the Communists win.\nExecuting Hitler: the liberals and the Communists win together.\nEvery other ending keeps its base winner: five liberal policies for the liberals; six fascist policies, or Hitler elected chancellor after three fascist policies, for the fascists.',
     glossaryTitle: 'Glossary',
     glossary: {
       policyTerm: 'Policy',

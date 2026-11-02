@@ -948,35 +948,45 @@ test('how-to-play covers the expansion and keeps the 5–10 rules', async ({ pag
   await expect(expansion).toContainText('Below 11 players it is off')
 
   const roles = sectionFor('Roles at 11–13')
-  await expect(roles).toContainText('11 players: 5 liberals, 3 fascists, 2 communists and Hitler.')
-  await expect(roles).toContainText('12: 6/3/2 and Hitler.')
-  await expect(roles).toContainText('13: 6/3/3 and Hitler.')
-  await expect(roles).toContainText('fascist count never includes Hitler')
-  await expect(roles).toContainText('Communists know each other; Hitler does not know them.')
+  await expect(roles).toContainText(
+    '11 players: 5 liberals, 3 fascists, 2 communists and Hitler.',
+  )
+  await expect(roles).toContainText(
+    '12 players: 6 liberals, 3 fascists, 2 communists and Hitler.',
+  )
+  await expect(roles).toContainText(
+    '13 players: 6 liberals, 3 fascists, 3 communists and Hitler.',
+  )
+  await expect(roles).toContainText('not counted in the fascist number')
+  await expect(roles).toContainText('do not know who the communists are')
 
   const deck = sectionFor('Deck and board')
   await expect(deck).toContainText('23 tiles: 8 communist, 5 liberal and 10 fascist')
-  await expect(deck).toContainText('fascist board for 9–10 players')
-  await expect(deck).toContainText('Five-Year Plan adds 2 communist and 1 liberal tile')
-  await expect(deck).toContainText('26 tiles in play')
+  await expect(deck).toContainText('six-space track')
+  await expect(deck).toContainText('9–10 player board')
 
   const track = sectionFor('Communist track')
   await expect(track).toContainText(
-    'blank, Radicalisation, Five-Year Plan, Radicalisation, Confession, and victory',
+    'blank, Radicalisation, Five-Year Plan, Radicalisation, Confession, victory',
   )
-  await expect(track).toContainText('sixth communist policy ends the game')
+  await expect(track).toContainText('happens immediately')
+  await expect(track).toContainText('26 tiles are in play')
+  await expect(track).toContainText('sixth communist policy wins')
 
   const secret = sectionFor('Radicalisation and Confession')
-  await expect(secret).toContainText('secret pass-the-phone steps')
-  await expect(secret).toContainText('converts one player to the communist party')
-  await expect(secret).toContainText('keeps their secret role card')
+  await expect(secret).toContainText('president privately chooses')
+  await expect(secret).toContainText('Hitler cannot be converted')
+  await expect(secret).toContainText('already a Communist does not change')
+  await expect(secret).toContainText('keeps their role card')
   await expect(secret).toContainText('party changes permanently')
-  await expect(secret).toContainText('win or lose with their current party')
-  await expect(secret).toContainText('Confession shows the sitting president')
+  await expect(secret).toContainText('not told who the other Communists are')
+  await expect(secret).toContainText('Confession is public')
+  await expect(secret).toContainText('current party is shown to the whole table')
 
   const victory = sectionFor('Victory with the expansion')
-  await expect(victory).toContainText('Six communist policies win for the Communists only')
-  await expect(victory).toContainText('joint liberal and communist win')
+  await expect(victory).toContainText('only the Communists')
+  await expect(victory).toContainText('liberals and the Communists win together')
+  await expect(victory).toContainText('six fascist policies')
 
   // Credits: rules inspired by Secret Hitler XL and the Socialist Expansion.
   await expect(page.getByText('Secret Hitler XL', { exact: false })).toBeVisible()

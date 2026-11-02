@@ -10,6 +10,6 @@ defineProps<{ title: string; open?: boolean }>()
       <h2 class="text-base font-bold">{{ title }}</h2>
       <AppIcon name="chevron" :size="16" class="chev" aria-hidden="true" />
     </summary>
-    <p class="px-3 pb-3 text-sm leading-relaxed text-muted"><slot /></p>
+    <div class="whitespace-pre-line px-3 pb-3 text-sm leading-relaxed text-muted"><slot /></div>
   </details>
 </template>
