@@ -3,7 +3,10 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { onBeforeRouteLeave, useRouter } from 'vue-router'
 import AppIcon from '../components/base/AppIcon.vue'
+import PageHeader from '../components/base/PageHeader.vue'
 import type { IconName } from '../components/base/icons'
+import StatTile from '../components/setup/StatTile.vue'
+import SummaryRow from '../components/setup/SummaryRow.vue'
 import { confirmAction } from '../stores/confirm'
 import { useGameStore } from '../stores/game'
 import { formatNumber } from '../i18n/format'
@@ -153,20 +156,11 @@ onBeforeRouteLeave(async () => {
 
 <template>
   <div class="page flex min-h-dvh flex-col safe-x safe-top">
-    <header class="flex items-center gap-2">
-      <button
-        type="button"
-        class="icon-btn"
-        :aria-label="t('common.back')"
-        @click="previous"
-      >
-        <AppIcon name="back" :size="20" />
-      </button>
-      <div class="min-w-0 flex-1">
-        <p class="eyebrow">{{ t('common.step', { current: num(step + 1), total: num(STEP_COUNT) }) }}</p>
-        <h1 class="truncate text-xl font-bold">{{ t('setup.title') }}</h1>
-      </div>
-    </header>
+    <PageHeader
+      :title="t('setup.title')"
+      :eyebrow="t('common.step', { current: num(step + 1), total: num(STEP_COUNT) })"
+      @back="previous"
+    />
 
     <ol class="mt-3 flex gap-2" :aria-label="t('setup.title')">
       <li
@@ -299,22 +293,10 @@ onBeforeRouteLeave(async () => {
         <template v-if="expansion">
           <p class="panel mt-4 p-3 text-sm font-bold">{{ t('setup.deckCommunist') }}</p>
           <dl class="mt-2 grid grid-cols-2 gap-2">
-            <div class="panel p-3">
-              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.liberalTiles') }}</dt>
-              <dd class="text-2xl font-bold">{{ num(recipe.liberal) }}</dd>
-            </div>
-            <div class="panel p-3">
-              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.fascistTiles') }}</dt>
-              <dd class="text-2xl font-bold">{{ num(recipe.fascist) }}</dd>
-            </div>
-            <div class="panel p-3">
-              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.deckTiles') }}</dt>
-              <dd class="text-2xl font-bold">{{ num(deckTotal) }}</dd>
-            </div>
-            <div class="panel p-3">
-              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.handTiles') }}</dt>
-              <dd class="text-2xl font-bold">{{ num(HAND_SIZE) }}</dd>
-            </div>
+            <StatTile :label="t('setup.liberalTiles')" :value="num(recipe.liberal)" />
+            <StatTile :label="t('setup.fascistTiles')" :value="num(recipe.fascist)" />
+            <StatTile :label="t('setup.deckTiles')" :value="num(deckTotal)" />
+            <StatTile :label="t('setup.handTiles')" :value="num(HAND_SIZE)" />
           </dl>
           <dl class="mt-4 grid gap-2">
             <div class="panel flex items-center justify-between gap-3 p-3">
@@ -362,22 +344,10 @@ onBeforeRouteLeave(async () => {
         </template>
         <template v-else>
           <dl class="mt-4 grid grid-cols-2 gap-2">
-            <div class="panel p-3">
-              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.liberalTiles') }}</dt>
-              <dd class="text-2xl font-bold">{{ num(recipe.liberal) }}</dd>
-            </div>
-            <div class="panel p-3">
-              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.fascistTiles') }}</dt>
-              <dd class="text-2xl font-bold">{{ num(recipe.fascist) }}</dd>
-            </div>
-            <div class="panel p-3">
-              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.deckTiles') }}</dt>
-              <dd class="text-2xl font-bold">{{ num(deckTotal) }}</dd>
-            </div>
-            <div class="panel p-3">
-              <dt class="text-xs font-bold uppercase text-muted">{{ t('setup.handTiles') }}</dt>
-              <dd class="text-2xl font-bold">{{ num(HAND_SIZE) }}</dd>
-            </div>
+            <StatTile :label="t('setup.liberalTiles')" :value="num(recipe.liberal)" />
+            <StatTile :label="t('setup.fascistTiles')" :value="num(recipe.fascist)" />
+            <StatTile :label="t('setup.deckTiles')" :value="num(deckTotal)" />
+            <StatTile :label="t('setup.handTiles')" :value="num(HAND_SIZE)" />
           </dl>
           <p class="mt-3 rounded-lg border border-gold/40 bg-gold/10 p-3 text-sm">
             {{ t('setup.physicalNote') }}
@@ -398,10 +368,9 @@ onBeforeRouteLeave(async () => {
           <p v-if="smallTable" class="p-3">
             <span class="chip">{{ t('setup.smallTableChip') }}</span>
           </p>
-          <div class="flex items-center justify-between gap-2 p-3">
-            <span class="text-sm text-muted">{{ t('setup.stepPlayers') }}</span>
-            <span class="font-bold">{{ t('setup.summaryPlayers', { count: num(count) }) }}</span>
-          </div>
+          <SummaryRow :label="t('setup.stepPlayers')">
+            {{ t('setup.summaryPlayers', { count: num(count) }) }}
+          </SummaryRow>
           <div v-if="expansion" class="p-3">
             <span class="text-sm text-muted">{{ t('setup.stepRoles') }}</span>
             <dl class="mt-1 grid grid-cols-2 gap-x-4 gap-y-1 text-sm font-bold">
@@ -423,20 +392,15 @@ onBeforeRouteLeave(async () => {
               </div>
             </dl>
           </div>
-          <div v-else class="flex items-center justify-between gap-2 p-3">
-            <span class="text-sm text-muted">{{ t('setup.stepRoles') }}</span>
-            <span class="text-end font-bold">
-              {{ t('setup.summaryRoles', { liberals: num(counts.liberal), fascists: num(counts.fascist) }) }}
-            </span>
-          </div>
-          <div v-if="expansion" class="flex items-center justify-between gap-2 p-3">
-            <span class="text-sm text-muted">{{ t('setup.stepComponents') }}</span>
-            <span class="text-end font-bold">{{ t('setup.fascistBoard910') }}</span>
-          </div>
-          <div v-else class="flex items-center justify-between gap-2 p-3">
-            <span class="text-sm text-muted">{{ t('setup.stepComponents') }}</span>
-            <span class="font-bold">{{ t('setup.summaryBoard', { variant }) }}</span>
-          </div>
+          <SummaryRow v-else :label="t('setup.stepRoles')">
+            {{ t('setup.summaryRoles', { liberals: num(counts.liberal), fascists: num(counts.fascist) }) }}
+          </SummaryRow>
+          <SummaryRow v-if="expansion" :label="t('setup.stepComponents')">
+            {{ t('setup.fascistBoard910') }}
+          </SummaryRow>
+          <SummaryRow v-else :label="t('setup.stepComponents')">
+            {{ t('setup.summaryBoard', { variant }) }}
+          </SummaryRow>
           <div class="p-3">
             <span class="text-sm text-muted">{{ t('setup.stepNames') }}</span>
             <ul class="mt-1 flex flex-wrap gap-1">

@@ -1,32 +1,33 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
-import AppIcon from '../components/base/AppIcon.vue'
+import PageHeader from '../components/base/PageHeader.vue'
+import RuleSection from '../components/howto/RuleSection.vue'
 
 const { t } = useI18n()
 const router = useRouter()
 
 const sections = [
-  ['objectiveTitle', 'objective', true],
-  ['rolesTitle', 'roles', false],
-  ['distributionTitle', 'distribution', false],
-  ['setupTitle', 'setup', false],
-  ['turnTitle', 'turn', true],
-  ['nominationTitle', 'nomination', false],
-  ['votingTitle', 'voting', false],
-  ['legislativeTitle', 'legislative', false],
-  ['executiveTitle', 'executive', false],
-  ['trackerTitle', 'tracker', false],
-  ['vetoTitle', 'veto', false],
-  ['victoryTitle', 'victory', false],
-  ['hitlerTitle', 'hitler', false],
-  ['smallTitle', 'small', false],
-  ['expansionTitle', 'expansion', false],
-  ['expansionRolesTitle', 'expansionRoles', false],
-  ['expansionDeckTitle', 'expansionDeck', false],
-  ['expansionTrackTitle', 'expansionTrack', false],
-  ['expansionSecretTitle', 'expansionSecret', false],
-  ['expansionVictoryTitle', 'expansionVictory', false],
+  { title: 'objectiveTitle', body: 'objective', open: true },
+  { title: 'rolesTitle', body: 'roles', open: false },
+  { title: 'distributionTitle', body: 'distribution', open: false },
+  { title: 'setupTitle', body: 'setup', open: false },
+  { title: 'turnTitle', body: 'turn', open: true },
+  { title: 'nominationTitle', body: 'nomination', open: false },
+  { title: 'votingTitle', body: 'voting', open: false },
+  { title: 'legislativeTitle', body: 'legislative', open: false },
+  { title: 'executiveTitle', body: 'executive', open: false },
+  { title: 'trackerTitle', body: 'tracker', open: false },
+  { title: 'vetoTitle', body: 'veto', open: false },
+  { title: 'victoryTitle', body: 'victory', open: false },
+  { title: 'hitlerTitle', body: 'hitler', open: false },
+  { title: 'smallTitle', body: 'small', open: false },
+  { title: 'expansionTitle', body: 'expansion', open: false },
+  { title: 'expansionRolesTitle', body: 'expansionRoles', open: false },
+  { title: 'expansionDeckTitle', body: 'expansionDeck', open: false },
+  { title: 'expansionTrackTitle', body: 'expansionTrack', open: false },
+  { title: 'expansionSecretTitle', body: 'expansionSecret', open: false },
+  { title: 'expansionVictoryTitle', body: 'expansionVictory', open: false },
 ] as const
 
 const glossary = [
@@ -46,23 +47,19 @@ function back(): void {
 
 <template>
   <div class="page safe-x safe-top">
-    <header class="flex items-center gap-2">
-      <button type="button" class="icon-btn" :aria-label="t('common.back')" @click="back">
-        <AppIcon name="back" :size="20" />
-      </button>
-      <h1 class="text-xl font-bold">{{ t('howTo.title') }}</h1>
-    </header>
+    <PageHeader :title="t('howTo.title')" @back="back" />
 
     <p class="mt-4 text-sm leading-relaxed text-muted">{{ t('howTo.intro') }}</p>
 
     <div class="mt-4 grid gap-2">
-      <details v-for="[title, body, open] in sections" :key="title" class="panel howto" :open="open">
-        <summary>
-          <h2 class="text-base font-bold">{{ t(`howTo.${title}`) }}</h2>
-          <AppIcon name="chevron" :size="16" class="chev" aria-hidden="true" />
-        </summary>
-        <p class="px-3 pb-3 text-sm leading-relaxed text-muted">{{ t(`howTo.${body}`) }}</p>
-      </details>
+      <RuleSection
+        v-for="section in sections"
+        :key="section.title"
+        :title="t(`howTo.${section.title}`)"
+        :open="section.open"
+      >
+        {{ t(`howTo.${section.body}`) }}
+      </RuleSection>
     </div>
 
     <section class="panel mt-3 p-3">

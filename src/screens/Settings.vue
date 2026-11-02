@@ -4,7 +4,11 @@ import { useI18n } from 'vue-i18n'
 import { useRouter } from 'vue-router'
 import AppDialog from '../components/base/AppDialog.vue'
 import AppIcon from '../components/base/AppIcon.vue'
+import PageHeader from '../components/base/PageHeader.vue'
 import type { IconName } from '../components/base/icons'
+import SettingChoice from '../components/settings/SettingChoice.vue'
+import SettingSection from '../components/settings/SettingSection.vue'
+import SettingSwitchRow from '../components/settings/SettingSwitchRow.vue'
 import { confirmAction } from '../stores/confirm'
 import { useGameStore } from '../stores/game'
 import { useSettingsStore, type Settings as SettingsValues } from '../stores/settings'
@@ -38,13 +42,21 @@ const rows = computed<Array<{ key: BooleanKey; icon: IconName; label: string; hi
     hint: t('settings.autoResumeHint'),
   },
 ])
+const localeOptions = [
+  { value: 'en', label: 'English' },
+  { value: 'fa', label: 'فارسی' },
+]
+const themeOptions = computed(() => [
+  { value: 'dark', label: t('settings.themeDark'), icon: 'moon' as const },
+  { value: 'light', label: t('settings.themeLight'), icon: 'sun' as const },
+])
+const orientationOptions = computed(() => [
+  { value: 'auto', label: t('settings.orientationAuto') },
+  { value: 'landscape', label: t('settings.orientationLandscape') },
+])
 
 function set<K extends keyof SettingsValues>(key: K, value: SettingsValues[K]): void {
   settings.set(key, value)
-}
-
-function toggle(key: BooleanKey): void {
-  set(key, !settings.settings[key])
 }
 
 function onScale(event: Event): void {
@@ -76,122 +88,55 @@ async function clearSave(): Promise<void> {
 
 <template>
   <div class="page safe-x safe-top">
-    <header class="flex items-center gap-2">
-      <button type="button" class="icon-btn" :aria-label="t('common.back')" @click="router.back()">
-        <AppIcon name="back" :size="20" />
-      </button>
-      <h1 class="text-xl font-bold">{{ t('settings.title') }}</h1>
-    </header>
+    <PageHeader :title="t('settings.title')" @back="router.back()" />
 
-    <section class="panel mt-4 p-3">
-      <h2 class="eyebrow">{{ t('settings.language') }}</h2>
-      <p class="mt-0.5 text-xs text-muted">{{ t('settings.languageHint') }}</p>
-      <div class="mt-2 grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          :class="settings.settings.locale === 'en' ? '!border-gold !text-gold' : ''"
-          :aria-pressed="settings.settings.locale === 'en'"
-          @click="set('locale', 'en')"
-        >
-          English
-        </button>
-        <button
-          type="button"
-          class="btn btn-secondary"
-          :class="settings.settings.locale === 'fa' ? '!border-gold !text-gold' : ''"
-          :aria-pressed="settings.settings.locale === 'fa'"
-          @click="set('locale', 'fa')"
-        >
-          فارسی
-        </button>
-      </div>
-    </section>
+    <SettingSection class="mt-4" :title="t('settings.language')" :hint="t('settings.languageHint')">
+      <SettingChoice
+        class="mt-2"
+        :model-value="settings.settings.locale"
+        :options="localeOptions"
+        @update:model-value="set('locale', $event as SettingsValues['locale'])"
+      />
+    </SettingSection>
 
-    <section class="panel mt-3 p-3">
-      <h2 class="eyebrow">{{ t('settings.theme') }}</h2>
-      <div class="mt-2 grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          class="btn btn-secondary gap-2"
-          :class="settings.settings.theme === 'dark' ? '!border-gold !text-gold' : ''"
-          :aria-pressed="settings.settings.theme === 'dark'"
-          @click="set('theme', 'dark')"
-        >
-          <AppIcon name="moon" :size="17" />
-          {{ t('settings.themeDark') }}
-        </button>
-        <button
-          type="button"
-          class="btn btn-secondary gap-2"
-          :class="settings.settings.theme === 'light' ? '!border-gold !text-gold' : ''"
-          :aria-pressed="settings.settings.theme === 'light'"
-          @click="set('theme', 'light')"
-        >
-          <AppIcon name="sun" :size="17" />
-          {{ t('settings.themeLight') }}
-        </button>
-      </div>
-      <div class="mt-3 flex items-center justify-between gap-3 border-t border-line pt-3">
-        <div class="min-w-0">
-          <p class="text-sm font-bold">{{ t('settings.contrast') }}</p>
-          <p class="text-xs text-muted">
-            {{ settings.settings.contrast === 'high' ? t('settings.contrastHigh') : t('settings.contrastNormal') }}
-          </p>
-        </div>
-        <button
-          type="button"
-          class="switch"
-          role="switch"
-          :aria-checked="settings.settings.contrast === 'high'"
-          :aria-label="t('settings.contrast')"
-          @click="set('contrast', settings.settings.contrast === 'high' ? 'normal' : 'high')"
-        />
-      </div>
-    </section>
+    <SettingSection class="mt-3" :title="t('settings.theme')">
+      <SettingChoice
+        class="mt-2"
+        :model-value="settings.settings.theme"
+        :options="themeOptions"
+        @update:model-value="set('theme', $event as SettingsValues['theme'])"
+      />
+      <SettingSwitchRow
+        class="mt-3 border-t border-line pt-3"
+        :model-value="settings.settings.contrast === 'high'"
+        :label="t('settings.contrast')"
+        :hint="
+          settings.settings.contrast === 'high' ? t('settings.contrastHigh') : t('settings.contrastNormal')
+        "
+        @update:model-value="set('contrast', $event ? 'high' : 'normal')"
+      />
+    </SettingSection>
 
     <section class="panel mt-3 divide-y divide-line p-3">
-      <div v-for="row in rows" :key="row.key" class="flex items-center justify-between gap-3 py-2.5 first:pt-0 last:pb-0">
-        <div class="flex min-w-0 items-start gap-2">
-          <AppIcon :name="row.icon" :size="18" class="mt-0.5 shrink-0 text-muted" />
-          <div class="min-w-0">
-            <p class="text-sm font-bold">{{ row.label }}</p>
-            <p v-if="row.hint" class="text-xs text-muted">{{ row.hint }}</p>
-          </div>
-        </div>
-        <button
-          type="button"
-          class="switch"
-          role="switch"
-          :aria-checked="settings.settings[row.key]"
-          :aria-label="row.label"
-          @click="toggle(row.key)"
-        />
-      </div>
+      <SettingSwitchRow
+        v-for="row in rows"
+        :key="row.key"
+        class="py-2.5 first:pt-0 last:pb-0"
+        :model-value="settings.settings[row.key]"
+        :label="row.label"
+        :hint="row.hint"
+        :icon="row.icon"
+        @update:model-value="set(row.key, $event)"
+      />
     </section>
 
-    <section class="panel mt-3 p-3">
-      <h2 class="eyebrow">{{ t('settings.orientation') }}</h2>
-      <div class="mt-2 grid grid-cols-2 gap-2">
-        <button
-          type="button"
-          class="btn btn-secondary"
-          :class="settings.settings.orientation === 'auto' ? '!border-gold !text-gold' : ''"
-          :aria-pressed="settings.settings.orientation === 'auto'"
-          @click="set('orientation', 'auto')"
-        >
-          {{ t('settings.orientationAuto') }}
-        </button>
-        <button
-          type="button"
-          class="btn btn-secondary"
-          :class="settings.settings.orientation === 'landscape' ? '!border-gold !text-gold' : ''"
-          :aria-pressed="settings.settings.orientation === 'landscape'"
-          @click="set('orientation', 'landscape')"
-        >
-          {{ t('settings.orientationLandscape') }}
-        </button>
-      </div>
+    <SettingSection class="mt-3" :title="t('settings.orientation')">
+      <SettingChoice
+        class="mt-2"
+        :model-value="settings.settings.orientation"
+        :options="orientationOptions"
+        @update:model-value="set('orientation', $event as SettingsValues['orientation'])"
+      />
       <div class="mt-3 border-t border-line pt-3">
         <div class="flex items-center justify-between gap-2">
           <label for="board-scale" class="text-sm font-bold">{{ t('settings.boardScale') }}</label>
@@ -209,17 +154,20 @@ async function clearSave(): Promise<void> {
         />
         <p class="mt-1 text-xs text-muted">{{ t('settings.boardScaleHint') }}</p>
       </div>
-    </section>
+    </SettingSection>
 
-    <section v-if="game.hasSave || game.state" class="panel mt-3 p-3">
-      <h2 class="eyebrow">{{ t('settings.clearSave') }}</h2>
-      <p class="mt-1 text-xs text-muted">{{ t('settings.clearSaveHint') }}</p>
+    <SettingSection
+      v-if="game.hasSave || game.state"
+      class="mt-3"
+      :title="t('settings.clearSave')"
+      :hint="t('settings.clearSaveHint')"
+    >
       <p v-if="cleared" class="mt-2 text-sm font-semibold text-gold">{{ t('settings.cleared') }}</p>
       <button type="button" class="btn btn-danger mt-2 w-full" @click="clearSave">
         <AppIcon name="trash" :size="18" />
         {{ t('settings.clearSave') }}
       </button>
-    </section>
+    </SettingSection>
 
     <footer class="mt-4 text-center">
       <button type="button" class="btn btn-secondary w-full" @click="about = true">

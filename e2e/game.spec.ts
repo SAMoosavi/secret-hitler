@@ -115,6 +115,37 @@ test('duplicate names block the setup wizard', async ({ page }) => {
   await expect(page.getByRole('button', { name: 'Next', exact: true })).toBeEnabled()
 })
 
+test('the setup wizard keeps its five steps, stat tiles and review rows', async ({ page }) => {
+  await page.goto('/')
+  await page.getByRole('button', { name: 'Start game' }).click()
+
+  for (const heading of ['How many players?', 'Player names', 'Role distribution']) {
+    await expect(page.getByRole('heading', { name: heading })).toBeVisible()
+    await page.getByRole('button', { name: 'Next', exact: true }).click()
+  }
+
+  await expect(page.getByRole('heading', { name: 'Prepare the table' })).toBeVisible()
+  await expect(page.locator('dl dt')).toHaveText([
+    'liberal policy tiles',
+    'fascist policy tiles',
+    'tiles in the policy deck',
+    'tiles drawn each session',
+  ])
+  await expect(page.locator('dl dd')).toHaveText(['6', '11', '17', '3'])
+
+  await page.getByRole('button', { name: 'Next', exact: true }).click()
+  await expect(page.getByRole('heading', { name: 'Ready to begin?' })).toBeVisible()
+  const rows = page.locator('.panel.divide-y > div')
+  await expect(rows).toHaveCount(4)
+  await expect(rows.nth(0)).toContainText('Players')
+  await expect(rows.nth(0)).toContainText('7 players')
+  await expect(rows.nth(1)).toContainText('Roles')
+  await expect(rows.nth(1)).toContainText('4 liberals · 2 fascists · 1 Hitler')
+  await expect(rows.nth(2)).toContainText('Components')
+  await expect(rows.nth(2)).toContainText('Board variant: 7–8 players')
+  await expect(rows.nth(3)).toContainText('Names')
+})
+
 test('the four-player house variant runs on the short tracks', async ({ page }) => {
   const names = NAMES.slice(0, 4)
   await page.goto('/')
