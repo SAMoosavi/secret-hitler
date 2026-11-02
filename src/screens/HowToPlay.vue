@@ -7,26 +7,26 @@ const { t } = useI18n()
 const router = useRouter()
 
 const sections = [
-  ['objectiveTitle', 'objective'],
-  ['rolesTitle', 'roles'],
-  ['distributionTitle', 'distribution'],
-  ['setupTitle', 'setup'],
-  ['turnTitle', 'turn'],
-  ['nominationTitle', 'nomination'],
-  ['votingTitle', 'voting'],
-  ['legislativeTitle', 'legislative'],
-  ['executiveTitle', 'executive'],
-  ['trackerTitle', 'tracker'],
-  ['vetoTitle', 'veto'],
-  ['victoryTitle', 'victory'],
-  ['hitlerTitle', 'hitler'],
-  ['smallTitle', 'small'],
-  ['expansionTitle', 'expansion'],
-  ['expansionRolesTitle', 'expansionRoles'],
-  ['expansionDeckTitle', 'expansionDeck'],
-  ['expansionTrackTitle', 'expansionTrack'],
-  ['expansionSecretTitle', 'expansionSecret'],
-  ['expansionVictoryTitle', 'expansionVictory'],
+  ['objectiveTitle', 'objective', true],
+  ['rolesTitle', 'roles', false],
+  ['distributionTitle', 'distribution', false],
+  ['setupTitle', 'setup', false],
+  ['turnTitle', 'turn', true],
+  ['nominationTitle', 'nomination', false],
+  ['votingTitle', 'voting', false],
+  ['legislativeTitle', 'legislative', false],
+  ['executiveTitle', 'executive', false],
+  ['trackerTitle', 'tracker', false],
+  ['vetoTitle', 'veto', false],
+  ['victoryTitle', 'victory', false],
+  ['hitlerTitle', 'hitler', false],
+  ['smallTitle', 'small', false],
+  ['expansionTitle', 'expansion', false],
+  ['expansionRolesTitle', 'expansionRoles', false],
+  ['expansionDeckTitle', 'expansionDeck', false],
+  ['expansionTrackTitle', 'expansionTrack', false],
+  ['expansionSecretTitle', 'expansionSecret', false],
+  ['expansionVictoryTitle', 'expansionVictory', false],
 ] as const
 
 const glossary = [
@@ -56,10 +56,13 @@ function back(): void {
     <p class="mt-4 text-sm leading-relaxed text-muted">{{ t('howTo.intro') }}</p>
 
     <div class="mt-4 grid gap-2">
-      <section v-for="[title, body] in sections" :key="title" class="panel p-3">
-        <h2 class="text-base font-bold">{{ t(`howTo.${title}`) }}</h2>
-        <p class="mt-1 text-sm leading-relaxed text-muted">{{ t(`howTo.${body}`) }}</p>
-      </section>
+      <details v-for="[title, body, open] in sections" :key="title" class="panel howto" :open="open">
+        <summary>
+          <h2 class="text-base font-bold">{{ t(`howTo.${title}`) }}</h2>
+          <AppIcon name="chevron" :size="16" class="chev" aria-hidden="true" />
+        </summary>
+        <p class="px-3 pb-3 text-sm leading-relaxed text-muted">{{ t(`howTo.${body}`) }}</p>
+      </details>
     </div>
 
     <section class="panel mt-3 p-3">
@@ -71,7 +74,6 @@ function back(): void {
         </div>
       </dl>
     </section>
-
     <p class="mt-3 rounded-lg border border-gold/40 bg-gold/10 p-3 text-sm leading-relaxed">
       {{ t('howTo.appNote') }}
     </p>

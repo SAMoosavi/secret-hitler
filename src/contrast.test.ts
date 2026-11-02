@@ -78,6 +78,10 @@ const readable: Array<[string, string]> = [
   ['--on-brass', '--brass'],
   ['--ink', '--table'],
   ['--ink-muted', '--table'],
+  ['--tray-ink', '--tray'],
+  ['--tray-muted', '--tray'],
+  ['--on-tray-gold', '--tray-gold'],
+  ['--tray-gold', '--tray'],
   // printed card faces (cream ink on the party colour, brass ink on the back)
   ['--card-face-ink', '--card-liberal'],
   ['--card-face-ink', '--card-fascist'],

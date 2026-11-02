@@ -91,7 +91,7 @@ function openInfo(
 
 <template>
   <div class="flex min-w-0 flex-col gap-1.5">
-    <div class="board p-1.5" :aria-label="t('a11y.board')">
+    <div class="board p-1.5" role="group" :aria-label="t('a11y.board')">
       <header
         class="mb-1 flex items-center justify-between gap-2 border-b border-board-edge/40 px-0.5 pb-0.5"
       >

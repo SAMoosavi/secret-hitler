@@ -173,13 +173,15 @@ function showBoard(): void {
     </p>
 
     <div class="game-main">
-      <GameBoard
-        :view="view"
-        :eligibilities="list"
-        :selectable="view.phase === 'nomination'"
-        :selected-id="selectedId"
-        @select="selectedId = $event"
-      />
+      <div class="game-stage">
+        <GameBoard
+          :view="view"
+          :eligibilities="list"
+          :selectable="view.phase === 'nomination'"
+          :selected-id="selectedId"
+          @select="selectedId = $event"
+        />
+      </div>
 
       <div class="game-rail">
         <section v-if="view.phase === 'nomination'" class="game-tray">

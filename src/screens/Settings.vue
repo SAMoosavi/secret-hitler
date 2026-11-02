@@ -49,7 +49,7 @@ function toggle(key: BooleanKey): void {
 
 function onScale(event: Event): void {
   const value = Number((event.target as HTMLInputElement).value)
-  if (Number.isFinite(value)) set('boardScale', Math.min(1.1, Math.max(0.85, value)))
+  if (Number.isFinite(value)) set('boardScale', Math.min(1, Math.max(0.85, value)))
 }
 
 async function clearSave(): Promise<void> {
@@ -202,7 +202,7 @@ async function clearSave(): Promise<void> {
           class="mt-2 w-full accent-[var(--gold)]"
           type="range"
           min="0.85"
-          max="1.1"
+          max="1"
           step="0.05"
           :value="settings.settings.boardScale"
           @input="onScale"
@@ -221,15 +221,15 @@ async function clearSave(): Promise<void> {
       </button>
     </section>
 
-    <section class="panel mt-3 p-3">
+    <footer class="mt-4 text-center">
       <button type="button" class="btn btn-secondary w-full" @click="about = true">
         <AppIcon name="book" :size="18" />
         {{ t('settings.about') }}
       </button>
-      <p class="mt-2 text-center text-xs text-muted">
+      <p class="mt-2 text-xs text-muted">
         {{ t('settings.version', { version }) }}
       </p>
-    </section>
+    </footer>
 
     <AppDialog :open="about" :title="t('about.title')" @close="about = false">
       <p class="text-sm leading-relaxed">{{ t('about.body') }}</p>

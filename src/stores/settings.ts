@@ -71,7 +71,7 @@ export const useSettingsStore = defineStore('settings', () => {
           isSettings(parsed) && 'settings' in parsed ? (parsed as { settings: unknown }).settings : parsed
         if (isSettings(loaded)) {
           const merged = { ...defaults(), ...loaded }
-          merged.boardScale = Math.min(1.1, Math.max(0.85, Number(merged.boardScale) || 1))
+          merged.boardScale = Math.min(1, Math.max(0.85, Number(merged.boardScale) || 1))
           if (!['en', 'fa'].includes(merged.locale)) merged.locale = 'en'
           if (!['dark', 'light'].includes(merged.theme)) merged.theme = 'dark'
           if (!['normal', 'high'].includes(merged.contrast)) merged.contrast = 'normal'

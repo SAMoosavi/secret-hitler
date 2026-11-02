@@ -50,7 +50,7 @@ describe('settings', () => {
   it('clamps board scale and survives a broken settings file', async () => {
     localStorage.setItem('sh.settings', '{"v":1,"settings":{"boardScale":9,"theme":"neon"}}')
     const store = await newStore()
-    expect(store.settings.boardScale).toBe(1.1)
+    expect(store.settings.boardScale).toBe(1)
     expect(store.settings.theme).toBe('dark')
   })
 

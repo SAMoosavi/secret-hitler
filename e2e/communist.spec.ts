@@ -939,7 +939,7 @@ test('how-to-play covers the expansion and keeps the 5–10 rules', async ({ pag
   await expect(page.getByRole('heading', { name: 'How to play', level: 1 })).toBeVisible()
 
   const sectionFor = (name: string) =>
-    page.locator('section').filter({ has: page.getByRole('heading', { name, exact: true }) })
+    page.locator('details').filter({ has: page.getByRole('heading', { name, exact: true }) })
 
   const expansion = sectionFor('Communist expansion (11–13 players)')
   await expect(expansion).toContainText('third party')
